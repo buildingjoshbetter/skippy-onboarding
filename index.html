@@ -635,11 +635,17 @@
     /* ============================================
        SEQUENCE 4: I Know You
        ============================================ */
-    #seq4 {
+    #seq4, #seq5 {
       padding: 8vh 12vw;
       align-items: flex-start;
       justify-content: flex-start;
       overflow-y: auto;
+    }
+    
+    .capability-header {
+      color: var(--gold) !important;
+      font-style: italic;
+      margin-bottom: 32px !important;
     }
 
     .skippy-speaks {
@@ -1196,16 +1202,10 @@
 
   <!-- SEQUENCE 5: Proactive Demos -->
   <div class="sequence" id="seq5">
-    <div class="demo-card" id="demoCard">
-      <div class="demo-source" id="demoSource"></div>
-      <div class="demo-message" id="demoMessage"></div>
-      <div class="demo-insight" id="demoInsight"></div>
-      <div class="demo-actions">
-        <button class="demo-btn" onclick="nextDemo()">Yes, do it</button>
-        <button class="demo-btn demo-btn-ghost" onclick="nextDemo()">Not now</button>
-      </div>
+    <div class="skippy-speaks" id="capabilityContainer">
+      <div class="skippy-line capability-header" id="capabilitiesHeader">Here's what I can do for you.</div>
+      <div id="capabilityLines"></div>
     </div>
-    <div class="demo-counter" id="demoCounter"></div>
   </div>
 
   <!-- SEQUENCE 6: The Promise -->
@@ -2628,171 +2628,130 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
     function runSequence5() {
       document.getElementById('seq5').classList.add('active');
       
-      // Generate demos from real data
-      const demos = generateDemos();
+      // Show header first
+      setTimeout(() => {
+        document.getElementById('capabilitiesHeader').classList.add('show');
+      }, 200);
       
-      // Create demo counter dots (clear first)
-      const counter = document.getElementById('demoCounter');
-      counter.innerHTML = '';
-      demos.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.className = 'demo-dot' + (i === 0 ? ' active' : '');
-        dot.id = 'demoDot' + i;
-        counter.appendChild(dot);
-      });
+      // Generate capability statements from real data
+      const capabilities = generateDemos();
       
-      window.currentDemos = demos;
-      window.demoIdx = 0;
-      showDemo();
+      const container = document.getElementById('capabilityLines');
+      container.innerHTML = '';
+      
+      let idx = 0;
+      
+      function showCapability() {
+        if (idx < capabilities.length) {
+          const line = capabilities[idx];
+          const div = document.createElement('div');
+          div.className = 'skippy-line';
+          div.innerHTML = line;
+          container.appendChild(div);
+          
+          setTimeout(() => div.classList.add('show'), 50);
+          
+          idx++;
+          setTimeout(showCapability, 1000); // Show next capability
+        } else {
+          // All capabilities shown, move to next sequence
+          setTimeout(() => {
+            document.getElementById('seq5').classList.remove('active');
+            runSequence6();
+          }, 2500);
+        }
+      }
+      
+      setTimeout(showCapability, 800);
     }
 
     function generateDemos() {
-      const demos = [];
+      // Generate flowing capability statements - NOT interactive cards
+      const capabilities = [];
       const cal = userData.calendar.analysis || {};
       const email = userData.email.analysis || {};
       
-      // Demo 1: REAL WORK MEETING prep (not health/personal)
+      // CALENDAR-BASED CAPABILITIES
       const nextWorkMeeting = cal.upcomingWorkMeetings?.[0];
       if (nextWorkMeeting && nextWorkMeeting.attendees?.length > 0) {
         const attendee = nextWorkMeeting.attendees[0];
         const eventDate = new Date(nextWorkMeeting.start);
         const dayName = eventDate.toLocaleDateString('en-US', { weekday: 'long' });
         
-        // Cross-reference with email to find relationship depth
-        const emailRelationship = email.topRelationships?.find(r => 
+        // Cross-reference with email
+        const emailRel = email.topRelationships?.find(r => 
           r.name.toLowerCase().includes(attendee.toLowerCase()) || 
           attendee.toLowerCase().includes(r.name.toLowerCase().split(' ')[0])
         );
         
-        if (emailRelationship) {
-          demos.push({
-            source: "Calendar + Email intelligence",
-            message: `You have "<span class="highlight">${nextWorkMeeting.title}</span>" with <span class="highlight">${attendee}</span> on ${dayName}. I found <span class="highlight">${emailRelationship.count} emails</span> between you.`,
-            insight: `Recent threads: "${emailRelationship.topSubjects?.[0]?.slice(0, 40) || 'Various topics'}..." — I can build a full prep doc with history, open items, and talking points.`
-          });
+        if (emailRel) {
+          capabilities.push(`<span class="highlight">${nextWorkMeeting.title}</span> with ${attendee} on ${dayName}. I found <span class="data">${emailRel.count}</span> emails between you — I'll prep the context.`);
         } else {
-          demos.push({
-            source: "From your calendar",
-            message: `You have "<span class="highlight">${nextWorkMeeting.title}</span>" with <span class="highlight">${attendee}</span> on ${dayName}. Want me to prep?`,
-            insight: `I'll search your inbox for any context and build a brief before your meeting.`
-          });
+          capabilities.push(`<span class="highlight">${nextWorkMeeting.title}</span> on ${dayName}. I'll pull together a brief before you walk in.`);
         }
       }
-
-      // Demo 2: HOT THREAD that needs attention
-      const hotThread = email.importantThreads?.find(t => t.messageCount >= 3);
-      if (hotThread) {
-        demos.push({
-          source: "Active conversation detected",
-          message: `"<span class="highlight">${hotThread.subject?.slice(0, 45) || 'Untitled'}${(hotThread.subject?.length || 0) > 45 ? '...' : ''}</span>" — <span class="highlight">${hotThread.messageCount} messages</span> and counting. This is heating up.`,
-          insight: `Want me to summarize the thread, extract action items, and draft your next response?`
-        });
-      }
-
-      // Demo 3: TOP RELATIONSHIP management
-      const topRel = email.topRelationships?.[0];
-      if (topRel && topRel.count >= 3) {
-        demos.push({
-          source: "Relationship intelligence",
-          message: `<span class="highlight">${topRel.name}</span> — <span class="highlight">${topRel.count} emails</span> across <span class="highlight">${topRel.threadCount} conversations</span>. Your most active relationship right now.`,
-          insight: `I can track response times, flag when you're slow to reply, and remind you to follow up on stale threads.`
-        });
-      }
-
-      // Demo 4: WRITING STYLE offer
-      if (email.writingStyle) {
-        demos.push({
-          source: "From your writing patterns",
-          message: `Your emails are <span class="highlight">${email.writingStyle}</span>. I've analyzed your tone, length, and style across <span class="highlight">${email.totalAnalyzed || 50}+ emails</span>.`,
-          insight: `When I draft emails for you, they'll sound like you wrote them. Want to see?`
-        });
-      }
-
-      // Demo 5: SPENDING analysis
-      const spendingServices = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
-      if (spendingServices.length >= 2) {
-        const totalReceipts = spendingServices.reduce((sum, [_, c]) => sum + c, 0);
-        const topTwo = spendingServices.slice(0, 2).map(([s]) => s.charAt(0).toUpperCase() + s.slice(1)).join(' and ');
-        
-        demos.push({
-          source: "Spending patterns",
-          message: `<span class="highlight">${totalReceipts} receipts</span> detected. You spend most on <span class="highlight">${topTwo}</span>.`,
-          insight: `I can categorize your expenses, spot unusual charges, and show you where your money actually goes.`
-        });
-      }
-
-      // Demo 6: WORK STYLE insight
-      if (cal.workStyle) {
-        const workStyleMessage = cal.workStyle === 'independent' 
-          ? `<span class="highlight">${cal.soloPercentage}%</span> of your calendar is protected solo time. You guard your focus fiercely.`
-          : cal.workStyle === 'collaborative'
-          ? `<span class="highlight">${cal.meetingPercentage}%</span> of your time is in meetings. You're deeply collaborative.`
-          : `You balance deep work and collaboration well.`;
-        
-        demos.push({
-          source: "Your work style",
-          message: workStyleMessage,
-          insight: cal.workStyle === 'independent' 
-            ? `I'll never suggest meetings during your focus blocks. I'll protect your time like you do.`
-            : `I can find gaps for focus time and protect them before someone books over them.`
-        });
-      }
-
-      // Demo 7: HEALTH/RITUAL acknowledgment
+      
+      // PERSONAL/HEALTH events - don't offer prep, offer protection
       if (cal.healthEvents?.length > 0) {
         const healthEvent = cal.healthEvents[0];
-        demos.push({
-          source: "Your priorities",
-          message: `I see you protect time for <span class="highlight">${healthEvent.title}</span>. ${cal.healthEvents.length > 1 ? `And ${cal.healthEvents.length - 1} other health/wellness blocks.` : ''}`,
-          insight: `I won't suggest scheduling over these. Your health comes first. I'll work around it.`
-        });
+        capabilities.push(`<span class="highlight">${healthEvent.title}</span> is protected. I'll never schedule over your health.`);
       }
-
+      
+      // HOME/PERSONAL events - contextual help
+      const personalEvent = cal.upcomingPersonal?.find(e => 
+        e.title?.toLowerCase().includes('clean') || 
+        e.title?.toLowerCase().includes('stacie') ||
+        e.title?.toLowerCase().includes('home')
+      );
+      if (personalEvent) {
+        capabilities.push(`<span class="highlight">${personalEvent.title}</span> on your calendar. I can remind you to leave cash or send a confirmation text.`);
+      }
+      
+      // EMAIL-BASED CAPABILITIES
+      const topRel = email.topRelationships?.[0];
+      if (topRel && topRel.topSubjects?.length > 0) {
+        const subject = topRel.topSubjects[0];
+        capabilities.push(`Your thread with <span class="highlight">${topRel.name}</span>: "<span class="data">${subject?.slice(0, 35) || ''}...</span>" — I can draft your reply.`);
+      }
+      
+      // HOT CONVERSATION
+      const hotThread = email.importantThreads?.find(t => t.messageCount >= 3);
+      if (hotThread && hotThread.subject) {
+        capabilities.push(`"<span class="highlight">${hotThread.subject.slice(0, 40)}${hotThread.subject.length > 40 ? '...' : ''}</span>" is <span class="data">${hotThread.messageCount}</span> messages deep. I'll summarize it and extract action items.`);
+      }
+      
+      // SPENDING
+      const spendingServices = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
+      if (spendingServices.length >= 2) {
+        const topService = spendingServices[0][0].charAt(0).toUpperCase() + spendingServices[0][0].slice(1);
+        capabilities.push(`<span class="data">${spendingServices.reduce((s, [_, c]) => s + c, 0)}</span> receipts tracked. <span class="highlight">${topService}</span> is your biggest spend. I'll categorize everything.`);
+      }
+      
+      // WRITING STYLE
+      if (email.writingStyle && email.totalAnalyzed > 10) {
+        capabilities.push(`I've learned your writing style from <span class="data">${email.totalAnalyzed}</span> emails. When I write for you, it sounds like you.`);
+      }
+      
+      // WORK STYLE
+      if (cal.workStyle === 'independent' && cal.soloPercentage) {
+        capabilities.push(`<span class="data">${cal.soloPercentage}%</span> of your time is protected focus. I'll defend it.`);
+      } else if (cal.workStyle === 'collaborative' && cal.meetingPercentage) {
+        capabilities.push(`<span class="data">${cal.meetingPercentage}%</span> of your time is meetings. I'll find you breathing room.`);
+      }
+      
+      // LOCATION
+      if (userData.location?.city) {
+        capabilities.push(`You're in <span class="highlight">${userData.location.city}</span>. I factor in commute, time zones, and local context — always.`);
+      }
+      
       // Fallback
-      if (demos.length === 0) {
-        demos.push({
-          source: "Getting started",
-          message: `Connect more data and watch me learn you.`,
-          insight: `Every email, every meeting, every pattern makes me smarter about how to help you.`
-        });
+      if (capabilities.length === 0) {
+        capabilities.push(`Every email, meeting, and pattern I see makes me smarter about how to help you.`);
       }
-
-      return demos.slice(0, 6); // Cap at 6 demos
-    }
-
-    function showDemo() {
-      const demo = window.currentDemos[window.demoIdx];
-      const card = document.getElementById('demoCard');
       
-      card.classList.remove('show');
-      
-      setTimeout(() => {
-        document.getElementById('demoSource').textContent = demo.source;
-        document.getElementById('demoMessage').innerHTML = demo.message;
-        document.getElementById('demoInsight').innerHTML = demo.insight;
-        card.classList.add('show');
-        
-        // Update dots
-        window.currentDemos.forEach((_, i) => {
-          const dot = document.getElementById('demoDot' + i);
-          if (dot) {
-            dot.className = 'demo-dot';
-            if (i < window.demoIdx) dot.classList.add('done');
-            if (i === window.demoIdx) dot.classList.add('active');
-          }
-        });
-      }, 300);
+      return capabilities.slice(0, 8);
     }
 
-    function nextDemo() {
-      window.demoIdx++;
-      if (window.demoIdx < window.currentDemos.length) {
-        showDemo();
-      } else {
-        document.getElementById('seq5').classList.remove('active');
-        runSequence6();
-      }
-    }
 
     function runSequence6() {
       document.getElementById('seq6').classList.add('active');
