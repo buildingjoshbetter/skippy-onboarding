@@ -1834,10 +1834,30 @@
           threadCount: rel.threadIds.size,
           importance: rel.count * Math.sqrt(rel.threadIds.size), // weight by conversation diversity
           recentSubject: rel.subjects[rel.subjects.length - 1] || '',
-          topSubjects: rel.subjects.slice(-3)
+          topSubjects: rel.subjects.slice(-5), // Keep more subjects for insight generation
+          recentSnippets: rel.snippets.slice(-3) // Keep recent snippets
         }))
+        .filter(rel => rel.count >= 1) // At least 1 email
         .sort((a, b) => b.importance - a.importance)
         .slice(0, 15);
+      
+      // Detect newsletters/subscriptions more broadly
+      const newsletterKeywords = ['newsletter', 'digest', 'weekly', 'daily', 'update', 'news', 'unsubscribe'];
+      emails.forEach(email => {
+        const subject = (email.subject || '').toLowerCase();
+        const snippet = (email.snippet || '').toLowerCase();
+        
+        if (newsletterKeywords.some(k => subject.includes(k) || snippet.includes('unsubscribe'))) {
+          const fromMatch = email.from?.match(/^([^<]+)?<?([^>]+@[^>]+)?>?$/);
+          const senderName = (fromMatch?.[1] || fromMatch?.[2] || email.from || '').trim().replace(/"/g, '');
+          if (senderName && !analysis.subscriptions.find(s => s.from === senderName)) {
+            analysis.subscriptions.push({
+              from: senderName,
+              subject: email.subject
+            });
+          }
+        }
+      });
       
       // Find most engaged threads (multiple back-and-forth)
       const threadCounts = {};
@@ -2440,84 +2460,118 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
         insights.push(`I see you're in <span class='data'>${location}</span>. ${timeContext}`);
       }
       
-      // DEEP CALENDAR INSIGHT - their work style
-      if (cal.workStyleInsight) {
+      // CALENDAR WORK STYLE - smarter insight
+      if (cal.workStyle === 'independent') {
+        insights.push(`You fiercely protect your solo time. Most of your calendar is intentional blocks for focus, health, and personal rituals.`);
+      } else if (cal.workStyle === 'collaborative') {
+        insights.push(`Your calendar is packed with people. Back-to-back meetings — you're in high demand.`);
+      } else if (cal.workStyleInsight) {
         insights.push(cal.workStyleInsight);
       }
       
-      // Health/personal rituals they protect
+      // HEALTH RITUALS - with frequency analysis
       if (cal.healthEvents?.length > 0) {
-        const healthTypes = cal.healthEvents.map(e => e.title).slice(0, 3);
-        insights.push(`I see you prioritize your health — <span class='highlight'>${healthTypes.join(', ')}</span>. ${cal.healthEvents.length > 2 ? 'Consistent.' : ''}`);
-      }
-      
-      // TOP RELATIONSHIP - cross reference email + calendar
-      const topEmailRelationship = email.topRelationships?.[0];
-      const topCalendarPerson = cal.topCollaborators?.[0];
-      
-      if (topEmailRelationship && topCalendarPerson && 
-          topEmailRelationship.name.toLowerCase().includes(topCalendarPerson.name.toLowerCase().split(' ')[0])) {
-        // Same person tops both! Strong relationship
-        insights.push(`<span class='highlight'>${topEmailRelationship.name}</span> is clearly important to you — <span class='data'>${topEmailRelationship.count}</span> emails AND <span class='data'>${topCalendarPerson.meetingCount}</span> meetings. Your closest collaborator.`);
-      } else {
-        // Different people
-        if (topEmailRelationship) {
-          const recentSubject = topEmailRelationship.topSubjects?.[0];
-          insights.push(`<span class='highlight'>${topEmailRelationship.name}</span> dominates your inbox — <span class='data'>${topEmailRelationship.count}</span> emails, <span class='data'>${topEmailRelationship.threadCount}</span> separate conversations.${recentSubject ? ` Most recently about "<span class='data'>${recentSubject.slice(0, 35)}${recentSubject.length > 35 ? '...' : ''}</span>".` : ''}`);
-        }
-        if (topCalendarPerson) {
-          insights.push(`<span class='highlight'>${topCalendarPerson.name}</span> gets your time — <span class='data'>${topCalendarPerson.meetingCount}</span> meetings on your calendar.`);
-        }
-      }
-      
-      // ACTIVE THREADS - show you understand their ongoing conversations
-      if (email.importantThreads?.length > 0) {
-        const hotThread = email.importantThreads[0];
-        if (hotThread.messageCount >= 3) {
-          insights.push(`You've got an active thread: "<span class='highlight'>${hotThread.subject?.slice(0, 40) || 'Untitled'}${(hotThread.subject?.length || 0) > 40 ? '...' : ''}</span>" — <span class='data'>${hotThread.messageCount}</span> messages deep. Something brewing there.`);
-        }
-      }
-      
-      // WRITING STYLE
-      if (email.writingStyle) {
-        insights.push(`Your emails are <span class='highlight'>${email.writingStyle}</span>. I'll match your style when I write for you.`);
-      }
-      
-      // TIME PATTERNS
-      if (email.isEarlyBird) {
-        insights.push(`You're an early bird — I see emails going out before most people wake up.`);
-      } else if (email.isNightOwl) {
-        insights.push(`You're a night owl — some of your best work happens after hours.`);
-      } else if (email.peakActivityHour !== null) {
-        const peakTime = email.peakActivityHour > 12 ? `${email.peakActivityHour - 12}pm` : `${email.peakActivityHour}am`;
-        insights.push(`Your peak email hour is around <span class='data'>${peakTime}</span>. That's when you're most active.`);
-      }
-      
-      // SPENDING INTELLIGENCE
-      const spendingServices = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
-      if (spendingServices.length > 0) {
-        const totalReceipts = spendingServices.reduce((sum, [_, c]) => sum + c, 0);
-        const topSpend = spendingServices[0];
-        const serviceName = topSpend[0].charAt(0).toUpperCase() + topSpend[0].slice(1);
+        // Group by title to find frequency
+        const healthByTitle = {};
+        cal.healthEvents.forEach(e => {
+          const title = e.title?.toLowerCase() || 'health';
+          healthByTitle[title] = (healthByTitle[title] || 0) + 1;
+        });
         
-        if (totalReceipts > 10) {
-          insights.push(`<span class='data'>${totalReceipts}</span> receipts in your inbox. <span class='highlight'>${serviceName}</span> shows up the most. I see where your money goes.`);
+        const healthEntries = Object.entries(healthByTitle).sort((a, b) => b[1] - a[1]);
+        if (healthEntries.length > 0) {
+          const [topHealth, count] = healthEntries[0];
+          const displayName = topHealth.charAt(0).toUpperCase() + topHealth.slice(1);
+          
+          if (count >= 3) {
+            insights.push(`I see you prioritize your health — <span class='highlight'>${displayName}</span> ${count >= 4 ? 'multiple times a week' : 'regularly'}. That's discipline.`);
+          } else if (count === 2) {
+            insights.push(`<span class='highlight'>${displayName}</span> twice on your calendar. You're consistent with your health.`);
+          } else {
+            insights.push(`I see <span class='highlight'>${displayName}</span> on your calendar. You make time for health.`);
+          }
         }
       }
       
-      // WORK TOPICS - what they're focused on
-      if (email.workTopics?.length > 0) {
-        const topics = email.workTopics.slice(0, 3).map(t => t.topic);
-        insights.push(`Your inbox is full of <span class='highlight'>${topics.join(', ')}</span>. That's what's demanding your attention.`);
+      // ACTUAL EMAIL CONTENT - the juicy stuff
+      const topRel = email.topRelationships?.[0];
+      if (topRel && topRel.snippets?.length > 0) {
+        // Get a real snippet from their conversation
+        const snippet = topRel.snippets[0];
+        const recentSubject = topRel.topSubjects?.[0];
+        
+        if (recentSubject && snippet) {
+          insights.push(`Your conversation with <span class='highlight'>${topRel.name}</span>: "<span class='data'>${recentSubject.slice(0, 40)}${recentSubject.length > 40 ? '...' : ''}</span>" — I can see the back-and-forth.`);
+        } else if (topRel.count >= 5) {
+          insights.push(`<span class='highlight'>${topRel.name}</span> — <span class='data'>${topRel.count}</span> emails, <span class='data'>${topRel.threadCount}</span> threads. You two talk a lot.`);
+        }
       }
       
-      // UNREAD + JUDGMENT
+      // INTENSE CONVERSATIONS - multi-message threads
+      if (email.importantThreads?.length > 0) {
+        const hotThread = email.importantThreads.find(t => t.messageCount >= 4);
+        if (hotThread && hotThread.subject) {
+          insights.push(`"<span class='highlight'>${hotThread.subject.slice(0, 45)}${hotThread.subject.length > 45 ? '...' : ''}</span>" — <span class='data'>${hotThread.messageCount}</span> messages deep. That conversation is heating up.`);
+        }
+      }
+      
+      // SUBSCRIPTIONS & NEWSLETTERS
+      if (email.subscriptions?.length > 0) {
+        const subNames = [...new Set(email.subscriptions.map(s => s.from.split(' ')[0]))].slice(0, 3);
+        if (subNames.length > 0) {
+          insights.push(`You're subscribed to <span class='highlight'>${subNames.join(', ')}</span>. I see what you're reading.`);
+        }
+      }
+      
+      // SPENDING - be specific
+      const spendingServices = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
+      if (spendingServices.length >= 2) {
+        const services = spendingServices.slice(0, 3).map(([s, c]) => {
+          const name = s.charAt(0).toUpperCase() + s.slice(1);
+          return `<span class='highlight'>${name}</span> (${c})`;
+        });
+        insights.push(`Your receipts: ${services.join(', ')}. I know where your money goes.`);
+      }
+      
+      // REAL EMAIL SUBJECT EXAMPLES
+      const recentEmails = email.topRelationships?.slice(0, 3).filter(r => r.topSubjects?.length > 0);
+      if (recentEmails?.length > 0) {
+        const emailExamples = recentEmails.map(r => `"${r.topSubjects[0]?.slice(0, 30) || ''}..."`).filter(s => s.length > 10);
+        if (emailExamples.length > 0) {
+          insights.push(`Recent in your inbox: ${emailExamples.slice(0, 2).join(', ')}. I'm reading everything.`);
+        }
+      }
+      
+      // CALENDAR PERSON vs EMAIL PERSON cross-reference
+      const topCalPerson = cal.topCollaborators?.[0];
+      if (topCalPerson && topRel) {
+        const calName = topCalPerson.name.toLowerCase();
+        const emailName = topRel.name.toLowerCase();
+        
+        if (calName !== emailName && !calName.includes(emailName.split(' ')[0]) && !emailName.includes(calName.split(' ')[0])) {
+          // Different people - interesting insight
+          insights.push(`<span class='highlight'>${topCalPerson.name}</span> gets your time (${topCalPerson.meetingCount} meetings). <span class='highlight'>${topRel.name}</span> gets your words (${topRel.count} emails). Different relationships.`);
+        }
+      }
+      
+      // TIME PATTERNS - fix the undefined bug
+      if (email.isEarlyBird) {
+        insights.push(`You're an early bird — emails going out before most people wake up.`);
+      } else if (email.isNightOwl) {
+        insights.push(`Night owl — some of your best work happens after hours.`);
+      } else if (email.peakActivityHour !== null && email.peakActivityHour !== undefined) {
+        const hour = parseInt(email.peakActivityHour);
+        if (!isNaN(hour)) {
+          const displayHour = hour === 0 ? '12am' : hour === 12 ? '12pm' : hour > 12 ? `${hour - 12}pm` : `${hour}am`;
+          insights.push(`Peak activity around <span class='data'>${displayHour}</span>. That's when you're most engaged.`);
+        }
+      }
+      
+      // UNREAD
       if (unread > 100) {
-        insights.push(`<span class='data'>${unread}</span> unread emails. You're overwhelmed. I'll help you triage.`);
+        insights.push(`<span class='data'>${unread}</span> unread. You're drowning. Let me help.`);
       } else if (unread > 30) {
-        insights.push(`<span class='data'>${unread}</span> unread emails. Building up. Want me to prioritize them?`);
-      } else if (unread > 0) {
-        insights.push(`Only <span class='data'>${unread}</span> unread. You stay on top of things.`);
+        insights.push(`<span class='data'>${unread}</span> unread and building. I can prioritize.`);
       }
       
       // POWERFUL CLOSING
