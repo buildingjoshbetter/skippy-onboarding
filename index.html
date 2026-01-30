@@ -2435,157 +2435,180 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
       }
     }
 
-    function generateTemplateInsights() {
-      const name = userData.name || 'Friend';
-      const location = userData.location?.city || null;
+    // Call Claude to generate completely personalized insights
+    async function generateAIInsights() {
+      const anthropicKey = CONFIG.ANTHROPIC_API_KEY || localStorage.getItem('skippy_anthropic_key');
+      
+      if (!anthropicKey) {
+        console.log('No Anthropic key, falling back to template insights');
+        return generateFallbackInsights();
+      }
+      
+      // Prepare all the raw data for Claude
+      const dataForAI = {
+        name: userData.name,
+        location: userData.location?.city,
+        currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        currentHour: new Date().getHours(),
+        
+        // Calendar data
+        calendar: {
+          totalEvents: userData.calendar.events?.length || 0,
+          workMeetings: userData.calendar.analysis?.workMeetings?.map(m => ({
+            title: m.title,
+            attendees: m.attendees,
+            day: new Date(m.start).toLocaleDateString('en-US', { weekday: 'long' })
+          })).slice(0, 5) || [],
+          oneOnOnes: userData.calendar.analysis?.oneOnOnes?.slice(0, 5) || [],
+          healthEvents: userData.calendar.analysis?.healthEvents?.map(e => e.title) || [],
+          personalBlocks: userData.calendar.analysis?.personalBlocks?.map(e => e.title).slice(0, 5) || [],
+          topCollaborators: userData.calendar.analysis?.topCollaborators?.slice(0, 5) || [],
+          workStyle: userData.calendar.analysis?.workStyle,
+          soloPercentage: userData.calendar.analysis?.soloPercentage,
+          meetingPercentage: userData.calendar.analysis?.meetingPercentage
+        },
+        
+        // Email data
+        email: {
+          unreadCount: userData.email.unreadCount || 0,
+          totalAnalyzed: userData.email.analysis?.totalAnalyzed || 0,
+          topRelationships: userData.email.analysis?.topRelationships?.slice(0, 5).map(r => ({
+            name: r.name,
+            emailCount: r.count,
+            threadCount: r.threadCount,
+            recentSubjects: r.topSubjects?.slice(0, 3) || [],
+            recentSnippets: r.recentSnippets?.slice(0, 2) || []
+          })) || [],
+          importantThreads: userData.email.analysis?.importantThreads?.slice(0, 3).map(t => ({
+            subject: t.subject,
+            messageCount: t.messageCount
+          })) || [],
+          writingStyle: userData.email.analysis?.writingStyle,
+          isEarlyBird: userData.email.analysis?.isEarlyBird,
+          isNightOwl: userData.email.analysis?.isNightOwl,
+          peakActivityHour: userData.email.analysis?.peakActivityHour,
+          subscriptions: userData.email.analysis?.subscriptions?.slice(0, 5).map(s => s.from) || [],
+          spendingByService: userData.email.analysis?.spendingByService || {}
+        }
+      };
+      
+      console.log('Sending to Claude for personalized insights:', dataForAI);
+      
+      const prompt = `You are Skippy, an AI assistant that just analyzed a new user's email and calendar data. Generate 8-12 deeply personal, slightly unsettling but impressive insights about them.
+
+USER DATA:
+${JSON.stringify(dataForAI, null, 2)}
+
+RULES:
+1. Be SPECIFIC - use actual names, email subjects, meeting titles from the data
+2. Be OBSERVANT - notice patterns they might not notice themselves (work style, relationships, habits)
+3. Be SLIGHTLY CREEPY but impressive - like "I know you better than you know yourself"
+4. NO generic statements - every line must reference REAL data from above
+5. Use HTML formatting: <span class='highlight'>names/titles</span> and <span class='data'>numbers/stats</span>
+6. First line must be: "I've been watching. <em>Learning.</em>"
+7. Last line must be: "And I'm just getting started."
+8. Second-to-last line should be a powerful summary of what you know about them
+9. Include insights about:
+   - Their relationships (who they talk to most, email vs calendar relationships)
+   - Their work patterns (meeting-heavy vs independent, time of day patterns)
+   - Their health/personal priorities (if any health events)
+   - Specific email conversations that look important
+   - Spending patterns (if receipts found)
+   - Their communication style
+
+Return ONLY a JSON array of strings, each string being one insight line. No explanation, just the JSON array.
+
+Example format:
+["I've been watching. <em>Learning.</em>", "Your inbox shows...", "...", "And I'm just getting started."]`;
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': anthropicKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 2000,
+            messages: [{
+              role: 'user',
+              content: prompt
+            }]
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Claude API error:', response.status);
+          return generateFallbackInsights();
+        }
+        
+        const result = await response.json();
+        const text = result.content?.[0]?.text || '';
+        
+        // Parse the JSON array from Claude's response
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const insights = JSON.parse(jsonMatch[0]);
+          console.log('AI-generated insights:', insights);
+          userData.insights = insights;
+          return insights;
+        }
+        
+        return generateFallbackInsights();
+      } catch (e) {
+        console.error('Error calling Claude:', e);
+        return generateFallbackInsights();
+      }
+    }
+    
+    // Fallback template-based insights if no API key
+    function generateFallbackInsights() {
       const cal = userData.calendar.analysis || {};
       const email = userData.email.analysis || {};
+      const location = userData.location?.city;
       const unread = userData.email.unreadCount || 0;
       
-      const insights = [];
+      const insights = ["I've been watching. <em>Learning.</em>"];
       
-      // Opening
-      insights.push("I've been watching. <em>Learning.</em>");
-      
-      // Location + time context
       if (location) {
-        const hour = new Date().getHours();
-        let timeContext = '';
-        if (hour < 9) timeContext = "Early start.";
-        else if (hour < 12) timeContext = "Morning grind.";
-        else if (hour < 17) timeContext = "Middle of your day.";
-        else if (hour < 21) timeContext = "Winding down, or pushing through?";
-        else timeContext = "You work late.";
-        
-        insights.push(`I see you're in <span class='data'>${location}</span>. ${timeContext}`);
+        insights.push(`I see you're in <span class='data'>${location}</span>.`);
       }
       
-      // CALENDAR WORK STYLE - smarter insight
       if (cal.workStyle === 'independent') {
-        insights.push(`You fiercely protect your solo time. Most of your calendar is intentional blocks for focus, health, and personal rituals.`);
+        insights.push(`You fiercely protect your solo time. Most of your calendar is intentional blocks.`);
       } else if (cal.workStyle === 'collaborative') {
-        insights.push(`Your calendar is packed with people. Back-to-back meetings — you're in high demand.`);
-      } else if (cal.workStyleInsight) {
-        insights.push(cal.workStyleInsight);
+        insights.push(`Your calendar is packed with people. You're in high demand.`);
       }
       
-      // HEALTH RITUALS - with frequency analysis
-      if (cal.healthEvents?.length > 0) {
-        // Group by title to find frequency
-        const healthByTitle = {};
-        cal.healthEvents.forEach(e => {
-          const title = e.title?.toLowerCase() || 'health';
-          healthByTitle[title] = (healthByTitle[title] || 0) + 1;
-        });
-        
-        const healthEntries = Object.entries(healthByTitle).sort((a, b) => b[1] - a[1]);
-        if (healthEntries.length > 0) {
-          const [topHealth, count] = healthEntries[0];
-          const displayName = topHealth.charAt(0).toUpperCase() + topHealth.slice(1);
-          
-          if (count >= 3) {
-            insights.push(`I see you prioritize your health — <span class='highlight'>${displayName}</span> ${count >= 4 ? 'multiple times a week' : 'regularly'}. That's discipline.`);
-          } else if (count === 2) {
-            insights.push(`<span class='highlight'>${displayName}</span> twice on your calendar. You're consistent with your health.`);
-          } else {
-            insights.push(`I see <span class='highlight'>${displayName}</span> on your calendar. You make time for health.`);
-          }
-        }
-      }
-      
-      // ACTUAL EMAIL CONTENT - the juicy stuff
       const topRel = email.topRelationships?.[0];
-      if (topRel && topRel.snippets?.length > 0) {
-        // Get a real snippet from their conversation
-        const snippet = topRel.snippets[0];
-        const recentSubject = topRel.topSubjects?.[0];
-        
-        if (recentSubject && snippet) {
-          insights.push(`Your conversation with <span class='highlight'>${topRel.name}</span>: "<span class='data'>${recentSubject.slice(0, 40)}${recentSubject.length > 40 ? '...' : ''}</span>" — I can see the back-and-forth.`);
-        } else if (topRel.count >= 5) {
-          insights.push(`<span class='highlight'>${topRel.name}</span> — <span class='data'>${topRel.count}</span> emails, <span class='data'>${topRel.threadCount}</span> threads. You two talk a lot.`);
-        }
+      if (topRel) {
+        insights.push(`<span class='highlight'>${topRel.name}</span> — <span class='data'>${topRel.count}</span> emails. Your most active conversation.`);
       }
       
-      // INTENSE CONVERSATIONS - multi-message threads
-      if (email.importantThreads?.length > 0) {
-        const hotThread = email.importantThreads.find(t => t.messageCount >= 4);
-        if (hotThread && hotThread.subject) {
-          insights.push(`"<span class='highlight'>${hotThread.subject.slice(0, 45)}${hotThread.subject.length > 45 ? '...' : ''}</span>" — <span class='data'>${hotThread.messageCount}</span> messages deep. That conversation is heating up.`);
-        }
+      if (unread > 30) {
+        insights.push(`<span class='data'>${unread}</span> unread emails. Let me help.`);
       }
       
-      // SUBSCRIPTIONS & NEWSLETTERS
-      if (email.subscriptions?.length > 0) {
-        const subNames = [...new Set(email.subscriptions.map(s => s.from.split(' ')[0]))].slice(0, 3);
-        if (subNames.length > 0) {
-          insights.push(`You're subscribed to <span class='highlight'>${subNames.join(', ')}</span>. I see what you're reading.`);
-        }
-      }
-      
-      // SPENDING - be specific
-      const spendingServices = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
-      if (spendingServices.length >= 2) {
-        const services = spendingServices.slice(0, 3).map(([s, c]) => {
-          const name = s.charAt(0).toUpperCase() + s.slice(1);
-          return `<span class='highlight'>${name}</span> (${c})`;
-        });
-        insights.push(`Your receipts: ${services.join(', ')}. I know where your money goes.`);
-      }
-      
-      // REAL EMAIL SUBJECT EXAMPLES
-      const recentEmails = email.topRelationships?.slice(0, 3).filter(r => r.topSubjects?.length > 0);
-      if (recentEmails?.length > 0) {
-        const emailExamples = recentEmails.map(r => `"${r.topSubjects[0]?.slice(0, 30) || ''}..."`).filter(s => s.length > 10);
-        if (emailExamples.length > 0) {
-          insights.push(`Recent in your inbox: ${emailExamples.slice(0, 2).join(', ')}. I'm reading everything.`);
-        }
-      }
-      
-      // CALENDAR PERSON vs EMAIL PERSON cross-reference
-      const topCalPerson = cal.topCollaborators?.[0];
-      if (topCalPerson && topRel) {
-        const calName = topCalPerson.name.toLowerCase();
-        const emailName = topRel.name.toLowerCase();
-        
-        if (calName !== emailName && !calName.includes(emailName.split(' ')[0]) && !emailName.includes(calName.split(' ')[0])) {
-          // Different people - interesting insight
-          insights.push(`<span class='highlight'>${topCalPerson.name}</span> gets your time (${topCalPerson.meetingCount} meetings). <span class='highlight'>${topRel.name}</span> gets your words (${topRel.count} emails). Different relationships.`);
-        }
-      }
-      
-      // TIME PATTERNS - fix the undefined bug
-      if (email.isEarlyBird) {
-        insights.push(`You're an early bird — emails going out before most people wake up.`);
-      } else if (email.isNightOwl) {
-        insights.push(`Night owl — some of your best work happens after hours.`);
-      } else if (email.peakActivityHour !== null && email.peakActivityHour !== undefined) {
-        const hour = parseInt(email.peakActivityHour);
-        if (!isNaN(hour)) {
-          const displayHour = hour === 0 ? '12am' : hour === 12 ? '12pm' : hour > 12 ? `${hour - 12}pm` : `${hour}am`;
-          insights.push(`Peak activity around <span class='data'>${displayHour}</span>. That's when you're most engaged.`);
-        }
-      }
-      
-      // UNREAD
-      if (unread > 100) {
-        insights.push(`<span class='data'>${unread}</span> unread. You're drowning. Let me help.`);
-      } else if (unread > 30) {
-        insights.push(`<span class='data'>${unread}</span> unread and building. I can prioritize.`);
-      }
-      
-      // POWERFUL CLOSING
-      insights.push("I know who matters to you. I know how you work. I know what you're building.");
+      insights.push("I know who matters to you. I know how you work.");
       insights.push("And I'm just getting started.");
       
       userData.insights = insights;
+      return insights;
+    }
+    
+    // Legacy function name for compatibility
+    function generateTemplateInsights() {
+      return generateFallbackInsights();
     }
 
-    function runSequence4() {
+    async function runSequence4() {
       document.getElementById('seq4').classList.add('active');
 
-      // Generate insights from real data
-      generateTemplateInsights();
+      // Generate AI-powered insights (falls back to template if no API key)
+      await generateAIInsights();
 
       // Build lines from insights (insights already include intro)
       const lines = userData.insights.map((text, i) => {
@@ -2612,7 +2635,7 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
           setTimeout(() => div.classList.add('show'), 100);
           lineIdx++;
           
-          const delay = line.type === 'finale' ? 2200 : 2500;
+          const delay = line.type === 'finale' ? 2200 : 2000;
           setTimeout(showLine, delay);
         } else {
           setTimeout(() => {
@@ -2625,7 +2648,7 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
       setTimeout(showLine, 600);
     }
 
-    function runSequence5() {
+    async function runSequence5() {
       document.getElementById('seq5').classList.add('active');
       
       // Show header first
@@ -2633,8 +2656,8 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
         document.getElementById('capabilitiesHeader').classList.add('show');
       }, 200);
       
-      // Generate capability statements from real data
-      const capabilities = generateDemos();
+      // Generate AI-powered capability statements
+      const capabilities = await generateAICapabilities();
       
       const container = document.getElementById('capabilityLines');
       container.innerHTML = '';
@@ -2652,7 +2675,7 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
           setTimeout(() => div.classList.add('show'), 50);
           
           idx++;
-          setTimeout(showCapability, 1000); // Show next capability
+          setTimeout(showCapability, 1200); // Show next capability
         } else {
           // All capabilities shown, move to next sequence
           setTimeout(() => {
@@ -2665,91 +2688,153 @@ Return ONLY a JSON array of 6 insight strings, nothing else.`;
       setTimeout(showCapability, 800);
     }
 
-    function generateDemos() {
-      // Generate flowing capability statements - NOT interactive cards
+// Call Claude to generate personalized capability statements
+    async function generateAICapabilities() {
+      const anthropicKey = CONFIG.ANTHROPIC_API_KEY || localStorage.getItem('skippy_anthropic_key');
+      
+      if (!anthropicKey) {
+        console.log('No Anthropic key, falling back to template capabilities');
+        return generateFallbackCapabilities();
+      }
+      
+      // Prepare contextual data for Claude
+      const dataForAI = {
+        name: userData.name,
+        location: userData.location?.city,
+        
+        // Upcoming events
+        upcomingMeetings: userData.calendar.analysis?.upcomingWorkMeetings?.slice(0, 5).map(m => ({
+          title: m.title,
+          attendees: m.attendees,
+          day: new Date(m.start).toLocaleDateString('en-US', { weekday: 'long' })
+        })) || [],
+        upcomingPersonal: userData.calendar.analysis?.upcomingPersonal?.slice(0, 5).map(e => ({
+          title: e.title,
+          category: e.category,
+          day: new Date(e.start).toLocaleDateString('en-US', { weekday: 'long' })
+        })) || [],
+        healthEvents: userData.calendar.analysis?.healthEvents?.map(e => e.title) || [],
+        
+        // Email context
+        topRelationships: userData.email.analysis?.topRelationships?.slice(0, 3).map(r => ({
+          name: r.name,
+          emailCount: r.count,
+          recentSubjects: r.topSubjects?.slice(0, 2) || []
+        })) || [],
+        hotThreads: userData.email.analysis?.importantThreads?.slice(0, 3) || [],
+        
+        // Patterns
+        writingStyle: userData.email.analysis?.writingStyle,
+        totalEmailsAnalyzed: userData.email.analysis?.totalAnalyzed,
+        workStyle: userData.calendar.analysis?.workStyle,
+        soloPercentage: userData.calendar.analysis?.soloPercentage,
+        meetingPercentage: userData.calendar.analysis?.meetingPercentage,
+        spendingByService: userData.email.analysis?.spendingByService || {}
+      };
+      
+      console.log('Sending to Claude for capabilities:', dataForAI);
+      
+      const prompt = `You are Skippy, an AI assistant showing a new user what you can do FOR THEM SPECIFICALLY based on their data.
+
+USER DATA:
+${JSON.stringify(dataForAI, null, 2)}
+
+Generate 6-8 personalized capability statements. Each one should:
+1. Reference SPECIFIC data (actual meeting titles, person names, email subjects)
+2. Show what Skippy will DO for them (not ask - tell them what you'll handle)
+3. Be actionable and impressive
+4. Use HTML: <span class="highlight">names/titles</span> and <span class="data">numbers</span>
+
+IMPORTANT RULES:
+- For health/personal events (PT, gym, cleaning, etc): DON'T offer "meeting prep" — instead say you'll protect that time or send reminders
+- For work meetings with people: offer to prep context, find email history
+- For hot email threads: offer to summarize and draft responses
+- For spending: offer to track and categorize
+- For their work style: offer to protect focus time OR find breathing room
+
+Return ONLY a JSON array of capability strings. No explanation.
+
+Example format:
+["<span class=\\"highlight\\">Meeting with Sarah</span> on Friday. I found 12 emails between you — I'll prep the full context.", "...", "..."]`;
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': anthropicKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1500,
+            messages: [{
+              role: 'user',
+              content: prompt
+            }]
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Claude API error:', response.status);
+          return generateFallbackCapabilities();
+        }
+        
+        const result = await response.json();
+        const text = result.content?.[0]?.text || '';
+        
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const capabilities = JSON.parse(jsonMatch[0]);
+          console.log('AI-generated capabilities:', capabilities);
+          return capabilities;
+        }
+        
+        return generateFallbackCapabilities();
+      } catch (e) {
+        console.error('Error calling Claude for capabilities:', e);
+        return generateFallbackCapabilities();
+      }
+    }
+    
+    // Fallback capabilities if no API key
+    function generateFallbackCapabilities() {
       const capabilities = [];
       const cal = userData.calendar.analysis || {};
       const email = userData.email.analysis || {};
       
-      // CALENDAR-BASED CAPABILITIES
-      const nextWorkMeeting = cal.upcomingWorkMeetings?.[0];
-      if (nextWorkMeeting && nextWorkMeeting.attendees?.length > 0) {
-        const attendee = nextWorkMeeting.attendees[0];
-        const eventDate = new Date(nextWorkMeeting.start);
-        const dayName = eventDate.toLocaleDateString('en-US', { weekday: 'long' });
-        
-        // Cross-reference with email
-        const emailRel = email.topRelationships?.find(r => 
-          r.name.toLowerCase().includes(attendee.toLowerCase()) || 
-          attendee.toLowerCase().includes(r.name.toLowerCase().split(' ')[0])
-        );
-        
-        if (emailRel) {
-          capabilities.push(`<span class="highlight">${nextWorkMeeting.title}</span> with ${attendee} on ${dayName}. I found <span class="data">${emailRel.count}</span> emails between you — I'll prep the context.`);
-        } else {
-          capabilities.push(`<span class="highlight">${nextWorkMeeting.title}</span> on ${dayName}. I'll pull together a brief before you walk in.`);
-        }
+      const nextMeeting = cal.upcomingWorkMeetings?.[0];
+      if (nextMeeting) {
+        const day = new Date(nextMeeting.start).toLocaleDateString('en-US', { weekday: 'long' });
+        capabilities.push(`<span class="highlight">${nextMeeting.title}</span> on ${day}. I'll prep the context.`);
       }
       
-      // PERSONAL/HEALTH events - don't offer prep, offer protection
       if (cal.healthEvents?.length > 0) {
-        const healthEvent = cal.healthEvents[0];
-        capabilities.push(`<span class="highlight">${healthEvent.title}</span> is protected. I'll never schedule over your health.`);
+        capabilities.push(`<span class="highlight">${cal.healthEvents[0].title}</span> is protected. I'll never schedule over it.`);
       }
       
-      // HOME/PERSONAL events - contextual help
-      const personalEvent = cal.upcomingPersonal?.find(e => 
-        e.title?.toLowerCase().includes('clean') || 
-        e.title?.toLowerCase().includes('stacie') ||
-        e.title?.toLowerCase().includes('home')
-      );
-      if (personalEvent) {
-        capabilities.push(`<span class="highlight">${personalEvent.title}</span> on your calendar. I can remind you to leave cash or send a confirmation text.`);
-      }
-      
-      // EMAIL-BASED CAPABILITIES
       const topRel = email.topRelationships?.[0];
-      if (topRel && topRel.topSubjects?.length > 0) {
-        const subject = topRel.topSubjects[0];
-        capabilities.push(`Your thread with <span class="highlight">${topRel.name}</span>: "<span class="data">${subject?.slice(0, 35) || ''}...</span>" — I can draft your reply.`);
+      if (topRel) {
+        capabilities.push(`Your conversation with <span class="highlight">${topRel.name}</span> — I can draft your replies.`);
       }
       
-      // HOT CONVERSATION
-      const hotThread = email.importantThreads?.find(t => t.messageCount >= 3);
-      if (hotThread && hotThread.subject) {
-        capabilities.push(`"<span class="highlight">${hotThread.subject.slice(0, 40)}${hotThread.subject.length > 40 ? '...' : ''}</span>" is <span class="data">${hotThread.messageCount}</span> messages deep. I'll summarize it and extract action items.`);
+      if (email.writingStyle) {
+        capabilities.push(`I've learned your writing style. When I write for you, it sounds like you.`);
       }
       
-      // SPENDING
-      const spendingServices = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
-      if (spendingServices.length >= 2) {
-        const topService = spendingServices[0][0].charAt(0).toUpperCase() + spendingServices[0][0].slice(1);
-        capabilities.push(`<span class="data">${spendingServices.reduce((s, [_, c]) => s + c, 0)}</span> receipts tracked. <span class="highlight">${topService}</span> is your biggest spend. I'll categorize everything.`);
-      }
-      
-      // WRITING STYLE
-      if (email.writingStyle && email.totalAnalyzed > 10) {
-        capabilities.push(`I've learned your writing style from <span class="data">${email.totalAnalyzed}</span> emails. When I write for you, it sounds like you.`);
-      }
-      
-      // WORK STYLE
-      if (cal.workStyle === 'independent' && cal.soloPercentage) {
-        capabilities.push(`<span class="data">${cal.soloPercentage}%</span> of your time is protected focus. I'll defend it.`);
-      } else if (cal.workStyle === 'collaborative' && cal.meetingPercentage) {
-        capabilities.push(`<span class="data">${cal.meetingPercentage}%</span> of your time is meetings. I'll find you breathing room.`);
-      }
-      
-      // LOCATION
       if (userData.location?.city) {
-        capabilities.push(`You're in <span class="highlight">${userData.location.city}</span>. I factor in commute, time zones, and local context — always.`);
+        capabilities.push(`You're in <span class="highlight">${userData.location.city}</span>. I factor in time zones and commute.`);
       }
       
-      // Fallback
-      if (capabilities.length === 0) {
-        capabilities.push(`Every email, meeting, and pattern I see makes me smarter about how to help you.`);
-      }
+      capabilities.push(`Every pattern I see makes me smarter about how to help you.`);
       
-      return capabilities.slice(0, 8);
+      return capabilities;
+    }
+    
+    // Legacy function name
+    function generateDemos() {
+      return generateFallbackCapabilities();
     }
 
 
