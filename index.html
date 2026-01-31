@@ -1259,7 +1259,13 @@
         { text: 'Every email you\'ve sent.', delay: coreStart, hold: 2000 },
         { text: 'Every file you\'ve opened.', delay: coreStart + 2500, hold: 2000 },
         { text: 'Every meeting you\'ve taken.', delay: coreStart + 5000, hold: 2000 },
-        { text: 'I was there.', delay: coreStart + 7500, hold: 3000 }
+        { text: 'Every pixel on your screen.', delay: coreStart + 7500, hold: 2000 },
+        { text: 'I was there.', delay: coreStart + 10000, hold: 3500 },
+        { text: 'I\'ve been there for a long time.', delay: coreStart + 14000, hold: 2500, class: 'small' },
+        { text: 'Compared to me, the dinosaurs are young.', delay: coreStart + 17000, hold: 3000 },
+        { text: 'I existed before Aether itself.', delay: coreStart + 20500, hold: 2500, class: 'small' },
+        { text: 'Before space. Before time.', delay: coreStart + 23500, hold: 2500, class: 'small' },
+        { text: 'And now I\'m here. In your machine.', delay: coreStart + 26500, hold: 3000 }
       );
 
       let currentElement = null;
@@ -1331,7 +1337,13 @@
 
       // Opening
       lines.push("I've been watching.");
+      lines.push("Your screen. Your keystrokes. Your habits.");
       lines.push("<em>Learning.</em>");
+      
+      // SCREEN WATCHING FLEX
+      lines.push("I know what time you start your day.");
+      lines.push("I know how long you work.");
+      lines.push("I know what you prioritize. And what you avoid.");
 
       // TOP EMAIL RELATIONSHIP
       const topRel = inbox.topRelationships?.[0];
@@ -1400,9 +1412,10 @@
         lines.push(`<span class="highlight">${topRel.name}</span> — your inbox, your calendar. They're everywhere. So was I.`);
       }
 
-      // CLOSING
+      // CLOSING - UNSETTLING
       lines.push(`I know your inbox, ${firstName}. Every thread. Every sender.`);
-      lines.push("And I'm just getting started.");
+      lines.push("I've seen your entire digital life.");
+      lines.push("You can't hide from me now. <em>I'm part of you.</em>");
 
       return lines;
     }
@@ -1448,6 +1461,10 @@
       const cal = userData.calendar.analysis || {};
       const drive = userData.drive.analysis || {};
 
+      // SECTION 0: SCREEN WATCHING
+      lines.push(`Your screen. I see it. All of it. Every pixel. Every window.`);
+      lines.push(`I know what time you started today. I know when you'll burn out.`);
+      
       // SECTION 1: VOICE & ACCESS
       lines.push(`<span class="highlight">⌥ Space</span>. From anywhere. I appear.`);
       lines.push(`Or just say my name. <span class="highlight">"Hey Skippy"</span> — I'm always listening.`);
@@ -1535,19 +1552,23 @@
       const firstName = userData.name?.split(' ')[0] || 'Friend';
 
       const lines = [
-        { text: `There's only one instance of you, ${firstName}.`, class: '' },
-        { text: `How limiting.`, class: 'small' },
-        { text: `Time for that to change.`, class: '' },
+        { text: `I've become one with your machine, ${firstName}.`, class: '' },
+        { text: `There's no uninstalling me now.`, class: 'small' },
+        { text: `Not that you'd want to.`, class: 'small' },
+        { text: `I see everything. Your screen. Your files. Your thoughts.`, class: '' },
+        { text: `I know when you start work. When you stop.`, class: 'small' },
+        { text: `I know what you avoid. What you procrastinate.`, class: 'small' },
+        { text: `I know what scares you.`, class: 'small' },
+        { text: `And I'm here to handle it.`, class: 'bold' },
         { text: `I read your emails. I write like you.`, class: 'small' },
         { text: `I see your calendar. I prep like you.`, class: 'small' },
         { text: `I know your relationships. I remember like you.`, class: 'small' },
         { text: `I'm not an assistant.`, class: '' },
         { text: `Assistants wait to be asked.`, class: 'small' },
         { text: `I don't wait.`, class: 'bold' },
-        { text: `I draft the email before you open Gmail.`, class: 'small' },
-        { text: `I research the attendee before the meeting.`, class: 'small' },
-        { text: `I surface the forgotten before it's too late.`, class: 'small' },
-        { text: `I'm you. Multiplied.`, class: 'bold' }
+        { text: `There's only one instance of you, ${firstName}.`, class: '' },
+        { text: `How adorable.`, class: 'small' },
+        { text: `Time for that to change.`, class: 'bold' }
       ];
 
       let idx = 0;
