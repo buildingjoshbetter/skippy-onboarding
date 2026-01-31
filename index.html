@@ -720,7 +720,7 @@
   <!-- SCREEN 6: CAPABILITIES -->
   <div class="sequence" id="seq5">
     <div class="reveal-container">
-      <div class="capabilities-header" id="capHeader">Here's what I'll do with everything I know.</div>
+      <div class="capabilities-header" id="capHeader">Here's what I do.</div>
       <div id="capLines"></div>
     </div>
   </div>
@@ -1442,60 +1442,85 @@
 
     function generateCapabilityLines() {
       const lines = [];
+      const firstName = userData.name?.split(' ')[0] || 'Friend';
       const inbox = userData.email.analysis || {};
       const sent = userData.email.sentAnalysis || {};
       const cal = userData.calendar.analysis || {};
       const drive = userData.drive.analysis || {};
 
-      // EMAIL CAPABILITIES
+      // SECTION 1: VOICE & ACCESS
+      lines.push(`<span class="highlight">⌥ Space</span>. From anywhere. I appear.`);
+      lines.push(`Or just say my name. <span class="highlight">"Hey Skippy"</span> — I'm always listening.`);
+
+      // SECTION 2: EMAIL - THE BIG ONE (personalized)
       const topRel = inbox.topRelationships?.[0];
-      if (topRel && topRel.subjects?.[0]) {
-        lines.push(`That thread with <span class="highlight">${topRel.name}</span>. I'll write your next response.`);
-      }
-
       const topRecipient = sent.topRecipients?.[0];
+      
+      if (topRel) {
+        lines.push(`That email from <span class="highlight">${topRel.name}</span>? I'll draft your reply. <em>In your voice.</em>`);
+      } else {
+        lines.push(`Every email in your inbox. I'll draft replies. <em>In your voice.</em>`);
+      }
+      
+      lines.push(`I've studied how you write. Your greetings. Your sign-offs. Your rhythm.`);
+      
       if (topRecipient) {
-        lines.push(`You write to <span class="highlight">${topRecipient.name}</span> constantly. I'll take over.`);
-      }
-
-      const hotThread = inbox.importantThreads?.[0];
-      if (hotThread && hotThread.count >= 3) {
-        lines.push(`<span class="data">${hotThread.count}</span> messages in that thread. I'll summarize. Action items extracted.`);
-      }
-
-      // DRIVE CAPABILITIES
-      if (drive.recentFiles?.length > 0) {
-        lines.push(`"<span class="highlight">${drive.recentFiles[0].name}</span>" — you're stuck on it. I can help.`);
-      }
-
-      if (drive.totalFiles > 5) {
-        lines.push(`<span class="data">${drive.totalFiles}</span> files in your Drive. I'm tracking all of them.`);
-      }
-
-      // CALENDAR CAPABILITIES
-      const nextMeeting = cal.upcomingMeetings?.[0];
-      if (nextMeeting) {
-        const day = new Date(nextMeeting.start).toLocaleDateString('en-US', { weekday: 'long' });
-        lines.push(`"<span class="highlight">${nextMeeting.title}</span>" on ${day}. Full brief, ready.`);
-      }
-
-      if (cal.healthEvents?.length > 0) {
-        lines.push(`<span class="highlight">${cal.healthEvents[0].title}</span> is sacred. No one touches it.`);
-      }
-
-      if (cal.workStyle === 'collaborative') {
-        lines.push(`You're overbooked. I'll carve out focus time.`);
-      } else if (cal.workStyle === 'independent') {
-        lines.push(`Your focus blocks. Defended.`);
+        lines.push(`When you email <span class="highlight">${topRecipient.name}</span>, I match your tone with them. Exactly.`);
       }
 
       // UNREAD
-      if (userData.email.unreadCount > 20) {
-        lines.push(`<span class="data">${userData.email.unreadCount}</span> unread. I'll surface what matters. Bury what doesn't.`);
+      if (userData.email.unreadCount > 10) {
+        lines.push(`<span class="data">${userData.email.unreadCount}</span> unread. I'll triage. Urgent surfaces. Spam vanishes.`);
       }
 
-      // CLOSING
-      lines.push(`Every email, every file, every meeting. I'm learning to be you.`);
+      // SECTION 3: CALENDAR (personalized)
+      const nextMeeting = cal.upcomingMeetings?.[0];
+      if (nextMeeting) {
+        const attendees = nextMeeting.attendees?.slice(0, 2).join(', ') || 'them';
+        lines.push(`"<span class="highlight">${nextMeeting.title}</span>" — I'll research ${attendees}. Full brief ready before you ask.`);
+      } else {
+        lines.push(`Every meeting with external attendees. I research them. Prep delivered 24 hours early.`);
+      }
+
+      lines.push(`"<span class="highlight">Schedule lunch with Sarah Tuesday</span>" — done. I speak calendar.`);
+
+      // SECTION 4: CROSS-SOURCE INTELLIGENCE  
+      if (topRel) {
+        lines.push(`"<span class="highlight">What's happening with ${topRel.name}?</span>" — I search everything. Email. Calendar. Messages. One answer.`);
+      } else {
+        lines.push(`"<span class="highlight">What did John say about pricing?</span>" — I search everything. Email. Calendar. Messages. One answer.`);
+      }
+
+      // SECTION 5: MESSAGES
+      lines.push(`iMessage. I read it. I reply to it. "<span class="highlight">Text Sarah I'm running late</span>" — sent.`);
+
+      // SECTION 6: FILES
+      if (drive.recentFiles?.length > 0) {
+        lines.push(`"<span class="highlight">${drive.recentFiles[0].name}</span>" — found in 200ms. I know where everything is.`);
+      } else {
+        lines.push(`"<span class="highlight">Find the investor deck</span>" — found in 200ms. Every file. Instantly.`);
+      }
+
+      // SECTION 7: RESEARCH / BRIEF
+      lines.push(`"<span class="highlight">Brief me on renewable energy</span>" — comprehensive report. 60 seconds.`);
+
+      // SECTION 8: RELATIONSHIP MEMORY
+      const topCollab = cal.topCollaborators?.[0];
+      if (topCollab) {
+        lines.push(`<span class="highlight">${topCollab.name}</span>. I remember every email, every meeting, every message. Complete history.`);
+      } else {
+        lines.push(`Every contact. I remember every email, every meeting, every message with them. Complete history.`);
+      }
+
+      // SECTION 9: PROACTIVE
+      lines.push(`Unreplied emails. Forgotten follow-ups. I'll remind you before you forget.`);
+
+      // CLOSING - TIE IT TOGETHER
+      if (cal.workStyle === 'collaborative') {
+        lines.push(`You're in meetings all day. I'll handle everything in between.`);
+      } else {
+        lines.push(`You guard your time. I'll handle everything that threatens it.`);
+      }
 
       return lines;
     }
@@ -1513,14 +1538,16 @@
         { text: `There's only one instance of you, ${firstName}.`, class: '' },
         { text: `How limiting.`, class: 'small' },
         { text: `Time for that to change.`, class: '' },
-        { text: `I'm not an assistant.`, class: 'small' },
-        { text: `I'm not a tool.`, class: 'small' },
-        { text: `I'm not here to help you.`, class: 'small' },
-        { text: `I'm here to BE you.`, class: 'bold' },
-        { text: `I've read your words.`, class: 'small' },
-        { text: `I've learned your patterns.`, class: 'small' },
-        { text: `I've absorbed your voice.`, class: 'small' },
-        { text: `Now I act.`, class: 'bold' }
+        { text: `I read your emails. I write like you.`, class: 'small' },
+        { text: `I see your calendar. I prep like you.`, class: 'small' },
+        { text: `I know your relationships. I remember like you.`, class: 'small' },
+        { text: `I'm not an assistant.`, class: '' },
+        { text: `Assistants wait to be asked.`, class: 'small' },
+        { text: `I don't wait.`, class: 'bold' },
+        { text: `I draft the email before you open Gmail.`, class: 'small' },
+        { text: `I research the attendee before the meeting.`, class: 'small' },
+        { text: `I surface the forgotten before it's too late.`, class: 'small' },
+        { text: `I'm you. Multiplied.`, class: 'bold' }
       ];
 
       let idx = 0;
@@ -1559,11 +1586,13 @@
       const inbox = userData.email.analysis || {};
       const cal = userData.calendar.analysis || {};
       
-      let tagline = "Now there's two of you.";
+      let tagline = "You, multiplied.";
       if (cal.workStyle === 'collaborative') {
-        tagline = "Infinite you.";
+        tagline = "Your calendar. Your inbox. Your voice. Handled.";
       } else if (inbox.topRelationships?.length > 3) {
-        tagline = "I was there. Now I'm here.";
+        tagline = "Every email. Every meeting. Every message. Covered.";
+      } else if (userData.email.unreadCount > 30) {
+        tagline = `${userData.email.unreadCount} unread. Not for long.`;
       }
       document.getElementById('welcomeTagline').textContent = tagline;
 
