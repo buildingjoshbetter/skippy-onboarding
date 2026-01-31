@@ -733,7 +733,7 @@
   <!-- SCREEN 8: WELCOME -->
   <div class="sequence" id="seq7">
     <div class="welcome-logo" id="welcomeLogo">Skippy</div>
-    <div class="welcome-tagline" id="welcomeTagline">Now there's two of you.</div>
+    <div class="welcome-tagline" id="welcomeTagline">Trust the Awesomeness.</div>
     <div class="welcome-greeting" id="welcomeGreeting">Welcome home.</div>
     <button class="enter-btn" id="enterBtn" onclick="finish()">Enter</button>
     <div class="shortcut-hint" id="shortcutHint">
@@ -1586,14 +1586,7 @@
       const inbox = userData.email.analysis || {};
       const cal = userData.calendar.analysis || {};
       
-      let tagline = "You, multiplied.";
-      if (cal.workStyle === 'collaborative') {
-        tagline = "Your calendar. Your inbox. Your voice. Handled.";
-      } else if (inbox.topRelationships?.length > 3) {
-        tagline = "Every email. Every meeting. Every message. Covered.";
-      } else if (userData.email.unreadCount > 30) {
-        tagline = `${userData.email.unreadCount} unread. Not for long.`;
-      }
+      let tagline = "Trust the Awesomeness.";
       document.getElementById('welcomeTagline').textContent = tagline;
 
       setTimeout(() => document.getElementById('welcomeLogo').classList.add('show'), 200);
