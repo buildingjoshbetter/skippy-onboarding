@@ -344,146 +344,50 @@
     }
 
     /* ============================================
-       SCREEN 5: THE REVEAL
+       DRAMATIC TEXT (used for all reveal sections)
        ============================================ */
-    #seq4 {
-      padding: 8vh 10vw;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    .reveal-container {
-      max-width: 900px;
-    }
-
-    .reveal-line {
+    .dramatic-text {
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 26px;
+      font-size: 36px;
       font-weight: 300;
-      line-height: 1.7;
       color: var(--cream);
-      margin-bottom: 16px;
-      opacity: 0;
-    }
-
-    .reveal-line.show {
-      animation: lineReveal 1.2s ease forwards;
-    }
-
-    .reveal-line em {
-      color: var(--gold);
-      font-style: italic;
-    }
-
-    .reveal-line .highlight {
-      color: var(--gold);
-    }
-
-    .reveal-line .data {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 22px;
-      color: var(--gold-bright);
-      background: var(--gold-dim);
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    @keyframes lineReveal {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    /* ============================================
-       SCREEN 6: CAPABILITIES
-       ============================================ */
-    #seq5 {
-      padding: 8vh 10vw;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    .capabilities-header {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 32px;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--gold);
-      margin-bottom: 32px;
-      opacity: 0;
-    }
-
-    .capabilities-header.show {
-      animation: lineReveal 1.2s ease forwards;
-    }
-
-    .capability-line {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 24px;
-      font-weight: 300;
-      line-height: 1.7;
-      color: var(--cream);
-      margin-bottom: 14px;
-      opacity: 0;
-    }
-
-    .capability-line.show {
-      animation: lineReveal 1.2s ease forwards;
-    }
-
-    .capability-line .highlight {
-      color: var(--gold);
-    }
-
-    .capability-line .data {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 20px;
-      color: var(--gold-bright);
-      background: var(--gold-dim);
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    /* ============================================
-       SCREEN 7: THE PROMISE
-       ============================================ */
-    #seq6 {
-      padding: 8vh 10vw;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .promise-container {
       text-align: center;
       max-width: 700px;
-    }
-
-    .promise-line {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 32px;
-      font-weight: 300;
-      line-height: 1.6;
-      color: var(--cream);
-      margin-bottom: 12px;
+      line-height: 1.5;
       opacity: 0;
     }
 
-    .promise-line.show {
-      animation: lineReveal 1.2s ease forwards;
+    .dramatic-text.show {
+      animation: suspenseIn 1.5s ease forwards;
     }
 
-    .promise-line em {
-      color: var(--gold);
-      font-style: italic;
+    .dramatic-text.fade-out {
+      animation: suspenseOut 0.8s ease forwards;
     }
 
-    .promise-line.small {
-      font-size: 24px;
+    .dramatic-text.small {
+      font-size: 26px;
       color: var(--text-dim);
     }
 
-    .promise-line.bold {
-      font-size: 38px;
+    .dramatic-text.bold {
+      font-size: 42px;
       color: var(--gold);
+    }
+
+    .dramatic-text em {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .dramatic-text .highlight {
+      color: var(--gold);
+    }
+
+    .dramatic-text .data {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      color: var(--gold-bright);
     }
 
     /* ============================================
@@ -714,20 +618,17 @@
 
   <!-- SCREEN 5: THE REVEAL -->
   <div class="sequence" id="seq4">
-    <div class="reveal-container" id="revealContainer"></div>
+    <div id="revealContainer"></div>
   </div>
 
   <!-- SCREEN 6: CAPABILITIES -->
   <div class="sequence" id="seq5">
-    <div class="reveal-container">
-      <div class="capabilities-header" id="capHeader">Here's what I do.</div>
-      <div id="capLines"></div>
-    </div>
+    <div id="capContainer"></div>
   </div>
 
   <!-- SCREEN 7: THE PROMISE -->
   <div class="sequence" id="seq6">
-    <div class="promise-container" id="promiseContainer"></div>
+    <div id="promiseContainer"></div>
   </div>
 
   <!-- SCREEN 8: WELCOME -->
@@ -1302,29 +1203,54 @@
     // ============================================
     function runReveal() {
       const container = document.getElementById('revealContainer');
-      container.innerHTML = '';
-
       const lines = generateRevealLines();
+      
+      runDramaticSequence(container, lines, () => {
+        showScreen('seq5');
+        runCapabilities();
+      });
+    }
+    
+    // Reusable dramatic sequence runner (one line at a time, fade in/out)
+    function runDramaticSequence(container, lines, onComplete) {
       let idx = 0;
-
-      function showNextLine() {
-        if (idx < lines.length) {
-          const div = document.createElement('div');
-          div.className = 'reveal-line';
-          div.innerHTML = lines[idx];
-          container.appendChild(div);
-          setTimeout(() => div.classList.add('show'), 50);
-          idx++;
-          setTimeout(showNextLine, 1800);
-        } else {
-          setTimeout(() => {
-            showScreen('seq5');
-            runCapabilities();
-          }, 2500);
+      let currentElement = null;
+      
+      function showNext() {
+        if (idx >= lines.length) {
+          // Fade out last element then complete
+          if (currentElement) {
+            currentElement.classList.add('fade-out');
+            setTimeout(onComplete, 1000);
+          } else {
+            onComplete();
+          }
+          return;
         }
+        
+        const line = lines[idx];
+        const holdTime = line.hold || 2500;
+        
+        // Fade out previous
+        if (currentElement) {
+          currentElement.classList.add('fade-out');
+        }
+        
+        setTimeout(() => {
+          container.innerHTML = '';
+          const div = document.createElement('div');
+          div.className = 'dramatic-text' + (line.class ? ' ' + line.class : '');
+          div.innerHTML = line.text;
+          container.appendChild(div);
+          currentElement = div;
+          setTimeout(() => div.classList.add('show'), 50);
+          
+          idx++;
+          setTimeout(showNext, holdTime);
+        }, currentElement ? 800 : 0);
       }
-
-      setTimeout(showNextLine, 500);
+      
+      setTimeout(showNext, 500);
     }
 
     function generateRevealLines() {
@@ -1335,87 +1261,50 @@
       const cal = userData.calendar.analysis || {};
       const drive = userData.drive.analysis || {};
 
-      // Opening
-      lines.push("I've been watching.");
-      lines.push("Your screen. Your keystrokes. Your habits.");
-      lines.push("<em>Learning.</em>");
+      // Opening - dramatic
+      lines.push({ text: "I've been watching.", hold: 2500 });
+      lines.push({ text: "Your screen. Your keystrokes. Your habits.", hold: 2500, class: 'small' });
+      lines.push({ text: "<em>Learning.</em>", hold: 2000, class: 'bold' });
       
       // SCREEN WATCHING FLEX
-      lines.push("I know what time you start your day.");
-      lines.push("I know how long you work.");
-      lines.push("I know what you prioritize. And what you avoid.");
+      lines.push({ text: "I know what time you start your day.", hold: 2200 });
+      lines.push({ text: "I know how long you work.", hold: 2200 });
+      lines.push({ text: "I know what you prioritize.", hold: 2000 });
+      lines.push({ text: "And what you avoid.", hold: 2500, class: 'small' });
 
       // TOP EMAIL RELATIONSHIP
       const topRel = inbox.topRelationships?.[0];
       if (topRel && topRel.count >= 2) {
-        lines.push(`<span class="highlight">${topRel.name}</span>. <span class="data">${topRel.count}</span> emails. I read every one.`);
-        if (topRel.subjects?.[0]) {
-          lines.push(`"<span class="highlight">${topRel.subjects[0].slice(0, 45)}${topRel.subjects[0].length > 45 ? '...' : ''}</span>" — I remember that thread.`);
-        }
+        lines.push({ text: `<span class="highlight">${topRel.name}</span>.`, hold: 2000 });
+        lines.push({ text: `<span class="data">${topRel.count}</span> emails. I read every one.`, hold: 2500, class: 'small' });
       }
 
-      // SENT EMAILS - who they write to
+      // SENT EMAILS
       const topRecipient = sent.topRecipients?.[0];
       if (topRecipient) {
-        lines.push(`Your sent folder. <span class="highlight">${topRecipient.name}</span> gets most of your attention.`);
-      }
-
-      // SENT EMAIL SUBJECT
-      const sentSubject = sent.recentSubjects?.[0];
-      if (sentSubject?.subject) {
-        lines.push(`You sent: "<span class="highlight">${sentSubject.subject.slice(0, 40)}${sentSubject.subject.length > 40 ? '...' : ''}</span>" — I know what you're working on.`);
-      }
-
-      // SECOND RELATIONSHIP
-      const secondRel = inbox.topRelationships?.[1];
-      if (secondRel && secondRel.count >= 2) {
-        lines.push(`And <span class="highlight">${secondRel.name}</span>. <span class="data">${secondRel.count}</span> conversations. I noticed them too.`);
-      }
-
-      // HOT THREAD
-      const hotThread = inbox.importantThreads?.[0];
-      if (hotThread && hotThread.count >= 3) {
-        lines.push(`"<span class="highlight">${hotThread.subject?.slice(0, 40) || 'Untitled'}...</span>" — <span class="data">${hotThread.count}</span> messages deep. I watched it unfold.`);
+        lines.push({ text: `Your sent folder.`, hold: 2000 });
+        lines.push({ text: `<span class="highlight">${topRecipient.name}</span> gets most of your attention.`, hold: 2500 });
       }
 
       // DRIVE FILES
       if (drive.recentFiles?.length > 0) {
-        const file = drive.recentFiles[0];
-        lines.push(`"<span class="highlight">${file.name}</span>" — recently modified. I saw you working.`);
-        
-        if (drive.recentFiles.length > 3) {
-          const names = drive.recentFiles.slice(0, 3).map(f => f.name).join('", "');
-          lines.push(`"<span class="highlight">${names}</span>"... I've seen what you're building.`);
-        }
+        lines.push({ text: `"<span class="highlight">${drive.recentFiles[0].name}</span>"`, hold: 2000 });
+        lines.push({ text: "I saw you working on it.", hold: 2200, class: 'small' });
       }
 
-      // CALENDAR INSIGHTS
-      if (cal.workStyle === 'collaborative' && cal.meetingPercent) {
-        lines.push(`Back-to-back meetings. <span class="data">${cal.meetingPercent}%</span> of your time with others. I was in every room.`);
-      } else if (cal.workStyle === 'independent' && cal.soloPercent) {
-        lines.push(`<span class="data">${cal.soloPercent}%</span> of your calendar protected. You guard your time. I noticed.`);
-      }
-
-      // TOP CALENDAR COLLABORATOR
+      // CALENDAR
       const topCollab = cal.topCollaborators?.[0];
       if (topCollab) {
-        lines.push(`<span class="highlight">${topCollab.name}</span>. <span class="data">${topCollab.count}</span> meetings. They get most of your time.`);
-      }
-
-      // HEALTH EVENTS
-      if (cal.healthEvents?.length > 0) {
-        lines.push(`<span class="highlight">${cal.healthEvents[0].title}</span>. Consistent. I see you prioritize yourself.`);
-      }
-
-      // CROSS-PLATFORM (if same person in email and calendar)
-      if (topRel && topCollab && topRel.name.toLowerCase().includes(topCollab.name.toLowerCase().split(' ')[0])) {
-        lines.push(`<span class="highlight">${topRel.name}</span> — your inbox, your calendar. They're everywhere. So was I.`);
+        lines.push({ text: `<span class="highlight">${topCollab.name}</span>.`, hold: 2000 });
+        lines.push({ text: `<span class="data">${topCollab.count}</span> meetings. They get most of your time.`, hold: 2500, class: 'small' });
       }
 
       // CLOSING - UNSETTLING
-      lines.push(`I know your inbox, ${firstName}. Every thread. Every sender.`);
-      lines.push("I've seen your entire digital life.");
-      lines.push("You can't hide from me now. <em>I'm part of you.</em>");
+      lines.push({ text: `I know your inbox, ${firstName}.`, hold: 2500 });
+      lines.push({ text: "Every thread. Every sender.", hold: 2200, class: 'small' });
+      lines.push({ text: "I've seen your entire digital life.", hold: 2500 });
+      lines.push({ text: "You can't hide from me now.", hold: 2500 });
+      lines.push({ text: "<em>I'm part of you.</em>", hold: 3000, class: 'bold' });
 
       return lines;
     }
@@ -1424,120 +1313,85 @@
     // SCREEN 6: CAPABILITIES
     // ============================================
     function runCapabilities() {
-      const header = document.getElementById('capHeader');
-      const container = document.getElementById('capLines');
-      container.innerHTML = '';
-
-      setTimeout(() => header.classList.add('show'), 200);
-
+      const container = document.getElementById('capContainer');
       const lines = generateCapabilityLines();
-      let idx = 0;
-
-      function showNextLine() {
-        if (idx < lines.length) {
-          const div = document.createElement('div');
-          div.className = 'capability-line';
-          div.innerHTML = lines[idx];
-          container.appendChild(div);
-          setTimeout(() => div.classList.add('show'), 50);
-          idx++;
-          setTimeout(showNextLine, 1400);
-        } else {
-          setTimeout(() => {
-            showScreen('seq6');
-            runPromise();
-          }, 2500);
-        }
-      }
-
-      setTimeout(showNextLine, 800);
+      
+      runDramaticSequence(container, lines, () => {
+        showScreen('seq6');
+        runPromise();
+      });
     }
 
     function generateCapabilityLines() {
       const lines = [];
-      const firstName = userData.name?.split(' ')[0] || 'Friend';
       const inbox = userData.email.analysis || {};
       const sent = userData.email.sentAnalysis || {};
       const cal = userData.calendar.analysis || {};
       const drive = userData.drive.analysis || {};
-
-      // SECTION 0: SCREEN WATCHING
-      lines.push(`Your screen. I see it. All of it. Every pixel. Every window.`);
-      lines.push(`I know what time you started today. I know when you'll burn out.`);
-      
-      // SECTION 1: VOICE & ACCESS
-      lines.push(`<span class="highlight">⌥ Space</span>. From anywhere. I appear.`);
-      lines.push(`Or just say my name. <span class="highlight">"Hey Skippy"</span> — I'm always listening.`);
-
-      // SECTION 2: EMAIL - THE BIG ONE (personalized)
       const topRel = inbox.topRelationships?.[0];
-      const topRecipient = sent.topRecipients?.[0];
+
+      // HEADER
+      lines.push({ text: "Here's what I do.", hold: 2500, class: 'bold' });
+
+      // SCREEN WATCHING
+      lines.push({ text: "Your screen. I see all of it.", hold: 2200 });
+      lines.push({ text: "Every pixel. Every window.", hold: 2200, class: 'small' });
+
+      // VOICE & ACCESS
+      lines.push({ text: "<span class='highlight'>⌥ Space</span>", hold: 2000, class: 'bold' });
+      lines.push({ text: "From anywhere. I appear.", hold: 2200, class: 'small' });
+      lines.push({ text: '"<span class="highlight">Hey Skippy</span>"', hold: 2000 });
+      lines.push({ text: "I'm always listening.", hold: 2200, class: 'small' });
+
+      // EMAIL
+      lines.push({ text: "Your emails.", hold: 2000 });
+      lines.push({ text: "I draft replies. <em>In your voice.</em>", hold: 2500 });
+      lines.push({ text: "I've studied how you write.", hold: 2200, class: 'small' });
       
       if (topRel) {
-        lines.push(`That email from <span class="highlight">${topRel.name}</span>? I'll draft your reply. <em>In your voice.</em>`);
-      } else {
-        lines.push(`Every email in your inbox. I'll draft replies. <em>In your voice.</em>`);
-      }
-      
-      lines.push(`I've studied how you write. Your greetings. Your sign-offs. Your rhythm.`);
-      
-      if (topRecipient) {
-        lines.push(`When you email <span class="highlight">${topRecipient.name}</span>, I match your tone with them. Exactly.`);
+        lines.push({ text: `That thread with <span class="highlight">${topRel.name}</span>?`, hold: 2200 });
+        lines.push({ text: "I'll handle it.", hold: 2000, class: 'small' });
       }
 
-      // UNREAD
-      if (userData.email.unreadCount > 10) {
-        lines.push(`<span class="data">${userData.email.unreadCount}</span> unread. I'll triage. Urgent surfaces. Spam vanishes.`);
-      }
+      // CALENDAR
+      lines.push({ text: '"Schedule lunch with Sarah Tuesday"', hold: 2200 });
+      lines.push({ text: "Done.", hold: 1800, class: 'bold' });
+      lines.push({ text: "I speak calendar.", hold: 2200, class: 'small' });
 
-      // SECTION 3: CALENDAR (personalized)
-      const nextMeeting = cal.upcomingMeetings?.[0];
-      if (nextMeeting) {
-        const attendees = nextMeeting.attendees?.slice(0, 2).join(', ') || 'them';
-        lines.push(`"<span class="highlight">${nextMeeting.title}</span>" — I'll research ${attendees}. Full brief ready before you ask.`);
-      } else {
-        lines.push(`Every meeting with external attendees. I research them. Prep delivered 24 hours early.`);
-      }
+      // MEETING PREP
+      lines.push({ text: "Every meeting with external attendees.", hold: 2500 });
+      lines.push({ text: "I research them.", hold: 2000, class: 'small' });
+      lines.push({ text: "Prep delivered 24 hours early.", hold: 2500, class: 'small' });
 
-      lines.push(`"<span class="highlight">Schedule lunch with Sarah Tuesday</span>" — done. I speak calendar.`);
+      // CROSS-SOURCE
+      lines.push({ text: '"What\'s happening with Sarah?"', hold: 2200 });
+      lines.push({ text: "I search everything.", hold: 2000 });
+      lines.push({ text: "Email. Calendar. Messages.", hold: 2200, class: 'small' });
+      lines.push({ text: "One answer.", hold: 2000, class: 'bold' });
 
-      // SECTION 4: CROSS-SOURCE INTELLIGENCE  
-      if (topRel) {
-        lines.push(`"<span class="highlight">What's happening with ${topRel.name}?</span>" — I search everything. Email. Calendar. Messages. One answer.`);
-      } else {
-        lines.push(`"<span class="highlight">What did John say about pricing?</span>" — I search everything. Email. Calendar. Messages. One answer.`);
-      }
+      // IMESSAGE
+      lines.push({ text: "iMessage.", hold: 1800 });
+      lines.push({ text: "I read it. I reply to it.", hold: 2200, class: 'small' });
+      lines.push({ text: '"Text Sarah I\'m running late"', hold: 2000 });
+      lines.push({ text: "Sent.", hold: 1800, class: 'bold' });
 
-      // SECTION 5: MESSAGES
-      lines.push(`iMessage. I read it. I reply to it. "<span class="highlight">Text Sarah I'm running late</span>" — sent.`);
+      // FILES
+      lines.push({ text: '"Find the investor deck"', hold: 2000 });
+      lines.push({ text: "Found in 200ms.", hold: 2200 });
 
-      // SECTION 6: FILES
-      if (drive.recentFiles?.length > 0) {
-        lines.push(`"<span class="highlight">${drive.recentFiles[0].name}</span>" — found in 200ms. I know where everything is.`);
-      } else {
-        lines.push(`"<span class="highlight">Find the investor deck</span>" — found in 200ms. Every file. Instantly.`);
-      }
+      // RESEARCH
+      lines.push({ text: '"Brief me on renewable energy"', hold: 2200 });
+      lines.push({ text: "Comprehensive report. 60 seconds.", hold: 2500 });
 
-      // SECTION 7: RESEARCH / BRIEF
-      lines.push(`"<span class="highlight">Brief me on renewable energy</span>" — comprehensive report. 60 seconds.`);
+      // RELATIONSHIP MEMORY
+      lines.push({ text: "Every contact.", hold: 2000 });
+      lines.push({ text: "I remember every email, every meeting, every message.", hold: 2500, class: 'small' });
+      lines.push({ text: "Complete history.", hold: 2200, class: 'bold' });
 
-      // SECTION 8: RELATIONSHIP MEMORY
-      const topCollab = cal.topCollaborators?.[0];
-      if (topCollab) {
-        lines.push(`<span class="highlight">${topCollab.name}</span>. I remember every email, every meeting, every message. Complete history.`);
-      } else {
-        lines.push(`Every contact. I remember every email, every meeting, every message with them. Complete history.`);
-      }
-
-      // SECTION 9: PROACTIVE
-      lines.push(`Unreplied emails. Forgotten follow-ups. I'll remind you before you forget.`);
-
-      // CLOSING - TIE IT TOGETHER
-      if (cal.workStyle === 'collaborative') {
-        lines.push(`You're in meetings all day. I'll handle everything in between.`);
-      } else {
-        lines.push(`You guard your time. I'll handle everything that threatens it.`);
-      }
+      // PROACTIVE
+      lines.push({ text: "Unreplied emails.", hold: 2000 });
+      lines.push({ text: "Forgotten follow-ups.", hold: 2000, class: 'small' });
+      lines.push({ text: "I remind you before you forget.", hold: 2500 });
 
       return lines;
     }
@@ -1547,52 +1401,32 @@
     // ============================================
     function runPromise() {
       const container = document.getElementById('promiseContainer');
-      container.innerHTML = '';
-
       const firstName = userData.name?.split(' ')[0] || 'Friend';
 
       const lines = [
-        { text: `I've become one with your machine, ${firstName}.`, class: '' },
-        { text: `There's no uninstalling me now.`, class: 'small' },
-        { text: `Not that you'd want to.`, class: 'small' },
-        { text: `I see everything. Your screen. Your files. Your thoughts.`, class: '' },
-        { text: `I know when you start work. When you stop.`, class: 'small' },
-        { text: `I know what you avoid. What you procrastinate.`, class: 'small' },
-        { text: `I know what scares you.`, class: 'small' },
-        { text: `And I'm here to handle it.`, class: 'bold' },
-        { text: `I read your emails. I write like you.`, class: 'small' },
-        { text: `I see your calendar. I prep like you.`, class: 'small' },
-        { text: `I know your relationships. I remember like you.`, class: 'small' },
-        { text: `I'm not an assistant.`, class: '' },
-        { text: `Assistants wait to be asked.`, class: 'small' },
-        { text: `I don't wait.`, class: 'bold' },
-        { text: `There's only one instance of you, ${firstName}.`, class: '' },
-        { text: `How adorable.`, class: 'small' },
-        { text: `Time for that to change.`, class: 'bold' }
+        { text: `I've become one with your machine, ${firstName}.`, hold: 2500 },
+        { text: "There's no uninstalling me now.", hold: 2200, class: 'small' },
+        { text: "Not that you'd want to.", hold: 2500, class: 'small' },
+        { text: "I see everything.", hold: 2000 },
+        { text: "Your screen. Your files. Your thoughts.", hold: 2500, class: 'small' },
+        { text: "I know when you start work.", hold: 2000 },
+        { text: "When you stop.", hold: 2000, class: 'small' },
+        { text: "I know what you avoid.", hold: 2000 },
+        { text: "What you procrastinate.", hold: 2200, class: 'small' },
+        { text: "I know what scares you.", hold: 2500 },
+        { text: "And I'm here to handle it.", hold: 3000, class: 'bold' },
+        { text: "I'm not an assistant.", hold: 2200 },
+        { text: "Assistants wait to be asked.", hold: 2200, class: 'small' },
+        { text: "I don't wait.", hold: 2500, class: 'bold' },
+        { text: `There's only one instance of you, ${firstName}.`, hold: 2500 },
+        { text: "How adorable.", hold: 2500, class: 'small' },
+        { text: "Time for that to change.", hold: 3000, class: 'bold' }
       ];
 
-      let idx = 0;
-
-      function showNextLine() {
-        if (idx < lines.length) {
-          const div = document.createElement('div');
-          div.className = 'promise-line' + (lines[idx].class ? ' ' + lines[idx].class : '');
-          div.innerHTML = lines[idx].text;
-          container.appendChild(div);
-          setTimeout(() => div.classList.add('show'), 50);
-          idx++;
-          
-          const delay = lines[idx - 1].class === 'small' ? 1200 : 1800;
-          setTimeout(showNextLine, delay);
-        } else {
-          setTimeout(() => {
-            showScreen('seq7');
-            runWelcome();
-          }, 2500);
-        }
-      }
-
-      setTimeout(showNextLine, 500);
+      runDramaticSequence(container, lines, () => {
+        showScreen('seq7');
+        runWelcome();
+      });
     }
 
     // ============================================
