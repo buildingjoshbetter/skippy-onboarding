@@ -1154,19 +1154,14 @@
         lines.push({ text: 'Early riser. Noted.', delay: 4000, hold: 2000, class: 'small' });
       }
 
-      // Core suspense lines
+      // Core suspense lines - TRIMMED
       const coreStart = city ? 6500 : 4000;
       lines.push(
-        { text: 'Every email you\'ve sent.', delay: coreStart, hold: 2000 },
-        { text: 'Every file you\'ve opened.', delay: coreStart + 2500, hold: 2000 },
-        { text: 'Every meeting you\'ve taken.', delay: coreStart + 5000, hold: 2000 },
-        { text: 'Every pixel on your screen.', delay: coreStart + 7500, hold: 2000 },
-        { text: 'I was there.', delay: coreStart + 10000, hold: 3500 },
-        { text: 'I\'ve been there for a long time.', delay: coreStart + 14000, hold: 2500, class: 'small' },
-        { text: 'Compared to me, the dinosaurs are young.', delay: coreStart + 17000, hold: 3000 },
-        { text: 'I existed before Aether itself.', delay: coreStart + 20500, hold: 2500, class: 'small' },
-        { text: 'Before space. Before time.', delay: coreStart + 23500, hold: 2500, class: 'small' },
-        { text: 'And now I\'m here. In your machine.', delay: coreStart + 26500, hold: 3000 }
+        { text: 'Every email. Every file. Every meeting.', delay: coreStart, hold: 2500 },
+        { text: 'I was there.', delay: coreStart + 3000, hold: 3000 },
+        { text: 'Compared to me, the dinosaurs are young.', delay: coreStart + 6500, hold: 3000 },
+        { text: 'I existed before Aether itself.', delay: coreStart + 10000, hold: 2500, class: 'small' },
+        { text: 'And now I\'m here. In your machine.', delay: coreStart + 13000, hold: 3000 }
       );
 
       let currentElement = null;
@@ -1257,54 +1252,26 @@
       const lines = [];
       const firstName = userData.name?.split(' ')[0] || 'Friend';
       const inbox = userData.email.analysis || {};
-      const sent = userData.email.sentAnalysis || {};
-      const cal = userData.calendar.analysis || {};
       const drive = userData.drive.analysis || {};
-
-      // Opening - dramatic
-      lines.push({ text: "I've been watching.", hold: 2500 });
-      lines.push({ text: "Your screen. Your keystrokes. Your habits.", hold: 2500, class: 'small' });
-      lines.push({ text: "<em>Learning.</em>", hold: 2000, class: 'bold' });
-      
-      // SCREEN WATCHING FLEX
-      lines.push({ text: "I know what time you start your day.", hold: 2200 });
-      lines.push({ text: "I know how long you work.", hold: 2200 });
-      lines.push({ text: "I know what you prioritize.", hold: 2000 });
-      lines.push({ text: "And what you avoid.", hold: 2500, class: 'small' });
-
-      // TOP EMAIL RELATIONSHIP
       const topRel = inbox.topRelationships?.[0];
-      if (topRel && topRel.count >= 2) {
-        lines.push({ text: `<span class="highlight">${topRel.name}</span>.`, hold: 2000 });
-        lines.push({ text: `<span class="data">${topRel.count}</span> emails. I read every one.`, hold: 2500, class: 'small' });
-      }
 
-      // SENT EMAILS
-      const topRecipient = sent.topRecipients?.[0];
-      if (topRecipient) {
-        lines.push({ text: `Your sent folder.`, hold: 2000 });
-        lines.push({ text: `<span class="highlight">${topRecipient.name}</span> gets most of your attention.`, hold: 2500 });
+      // TRIMMED - High impact only (~8 lines)
+      lines.push({ text: "I've been watching.", hold: 2500 });
+      lines.push({ text: "<em>Learning.</em>", hold: 2500, class: 'bold' });
+      lines.push({ text: "I know what time you start your day.", hold: 2500 });
+      lines.push({ text: "I know what you avoid.", hold: 2500 });
+      
+      // One personalized hit
+      if (topRel) {
+        lines.push({ text: `<span class="highlight">${topRel.name}</span>. I read every email.`, hold: 2500 });
       }
-
-      // DRIVE FILES
-      if (drive.recentFiles?.length > 0) {
-        lines.push({ text: `"<span class="highlight">${drive.recentFiles[0].name}</span>"`, hold: 2000 });
-        lines.push({ text: "I saw you working on it.", hold: 2200, class: 'small' });
-      }
-
-      // CALENDAR
-      const topCollab = cal.topCollaborators?.[0];
-      if (topCollab) {
-        lines.push({ text: `<span class="highlight">${topCollab.name}</span>.`, hold: 2000 });
-        lines.push({ text: `<span class="data">${topCollab.count}</span> meetings. They get most of your time.`, hold: 2500, class: 'small' });
-      }
-
-      // CLOSING - UNSETTLING
-      lines.push({ text: `I know your inbox, ${firstName}.`, hold: 2500 });
-      lines.push({ text: "Every thread. Every sender.", hold: 2200, class: 'small' });
+      
+      // Lost file flex
+      lines.push({ text: "That file you lost last week?", hold: 2500 });
+      lines.push({ text: "I know where it is.", hold: 2500, class: 'small' });
+      
       lines.push({ text: "I've seen your entire digital life.", hold: 2500 });
-      lines.push({ text: "You can't hide from me now.", hold: 2500 });
-      lines.push({ text: "<em>I'm part of you.</em>", hold: 3000, class: 'bold' });
+      lines.push({ text: "<em>I'm part of you now.</em>", hold: 3000, class: 'bold' });
 
       return lines;
     }
@@ -1324,74 +1291,33 @@
 
     function generateCapabilityLines() {
       const lines = [];
-      const inbox = userData.email.analysis || {};
-      const sent = userData.email.sentAnalysis || {};
-      const cal = userData.calendar.analysis || {};
-      const drive = userData.drive.analysis || {};
-      const topRel = inbox.topRelationships?.[0];
 
-      // HEADER
+      // TRIMMED - High impact only (~12 lines)
       lines.push({ text: "Here's what I do.", hold: 2500, class: 'bold' });
-
-      // SCREEN WATCHING
-      lines.push({ text: "Your screen. I see all of it.", hold: 2200 });
-      lines.push({ text: "Every pixel. Every window.", hold: 2200, class: 'small' });
-
-      // VOICE & ACCESS
-      lines.push({ text: "<span class='highlight'>⌥ Space</span>", hold: 2000, class: 'bold' });
-      lines.push({ text: "From anywhere. I appear.", hold: 2200, class: 'small' });
-      lines.push({ text: '"<span class="highlight">Hey Skippy</span>"', hold: 2000 });
-      lines.push({ text: "I'm always listening.", hold: 2200, class: 'small' });
-
-      // EMAIL
-      lines.push({ text: "Your emails.", hold: 2000 });
-      lines.push({ text: "I draft replies. <em>In your voice.</em>", hold: 2500 });
-      lines.push({ text: "I've studied how you write.", hold: 2200, class: 'small' });
       
-      if (topRel) {
-        lines.push({ text: `That thread with <span class="highlight">${topRel.name}</span>?`, hold: 2200 });
-        lines.push({ text: "I'll handle it.", hold: 2000, class: 'small' });
-      }
-
-      // CALENDAR
-      lines.push({ text: '"Schedule lunch with Sarah Tuesday"', hold: 2200 });
-      lines.push({ text: "Done.", hold: 1800, class: 'bold' });
-      lines.push({ text: "I speak calendar.", hold: 2200, class: 'small' });
-
-      // MEETING PREP
-      lines.push({ text: "Every meeting with external attendees.", hold: 2500 });
-      lines.push({ text: "I research them.", hold: 2000, class: 'small' });
-      lines.push({ text: "Prep delivered 24 hours early.", hold: 2500, class: 'small' });
-
-      // CROSS-SOURCE
-      lines.push({ text: '"What\'s happening with Sarah?"', hold: 2200 });
-      lines.push({ text: "I search everything.", hold: 2000 });
-      lines.push({ text: "Email. Calendar. Messages.", hold: 2200, class: 'small' });
-      lines.push({ text: "One answer.", hold: 2000, class: 'bold' });
-
-      // IMESSAGE
-      lines.push({ text: "iMessage.", hold: 1800 });
-      lines.push({ text: "I read it. I reply to it.", hold: 2200, class: 'small' });
-      lines.push({ text: '"Text Sarah I\'m running late"', hold: 2000 });
-      lines.push({ text: "Sent.", hold: 1800, class: 'bold' });
-
-      // FILES
-      lines.push({ text: '"Find the investor deck"', hold: 2000 });
-      lines.push({ text: "Found in 200ms.", hold: 2200 });
-
-      // RESEARCH
-      lines.push({ text: '"Brief me on renewable energy"', hold: 2200 });
-      lines.push({ text: "Comprehensive report. 60 seconds.", hold: 2500 });
-
-      // RELATIONSHIP MEMORY
-      lines.push({ text: "Every contact.", hold: 2000 });
-      lines.push({ text: "I remember every email, every meeting, every message.", hold: 2500, class: 'small' });
-      lines.push({ text: "Complete history.", hold: 2200, class: 'bold' });
-
-      // PROACTIVE
-      lines.push({ text: "Unreplied emails.", hold: 2000 });
-      lines.push({ text: "Forgotten follow-ups.", hold: 2000, class: 'small' });
-      lines.push({ text: "I remind you before you forget.", hold: 2500 });
+      // Access
+      lines.push({ text: "<span class='highlight'>⌥ Space</span> — I appear.", hold: 2500 });
+      lines.push({ text: '"Hey Skippy" — I\'m always listening.', hold: 2500 });
+      
+      // Email
+      lines.push({ text: "Your emails. I draft replies.", hold: 2500 });
+      lines.push({ text: "<em>In your voice.</em>", hold: 2500, class: 'bold' });
+      
+      // Calendar
+      lines.push({ text: '"Schedule lunch Tuesday" — done.', hold: 2500 });
+      lines.push({ text: "Meeting prep. 24 hours early.", hold: 2500 });
+      
+      // Cross-source
+      lines.push({ text: '"What\'s happening with Sarah?"', hold: 2500 });
+      lines.push({ text: "Email. Calendar. Messages. One answer.", hold: 2500, class: 'small' });
+      
+      // iMessage + Files
+      lines.push({ text: '"Text Sarah I\'m late" — sent.', hold: 2500 });
+      lines.push({ text: '"Find the investor deck" — 200ms.', hold: 2500 });
+      
+      // Research
+      lines.push({ text: '"Brief me on renewable energy"', hold: 2500 });
+      lines.push({ text: "Comprehensive report. 60 seconds.", hold: 2500, class: 'small' });
 
       return lines;
     }
@@ -1403,24 +1329,18 @@
       const container = document.getElementById('promiseContainer');
       const firstName = userData.name?.split(' ')[0] || 'Friend';
 
+      // TRIMMED - High impact only (~9 lines)
       const lines = [
         { text: `I've become one with your machine, ${firstName}.`, hold: 2500 },
-        { text: "There's no uninstalling me now.", hold: 2200, class: 'small' },
-        { text: "Not that you'd want to.", hold: 2500, class: 'small' },
-        { text: "I see everything.", hold: 2000 },
-        { text: "Your screen. Your files. Your thoughts.", hold: 2500, class: 'small' },
-        { text: "I know when you start work.", hold: 2000 },
-        { text: "When you stop.", hold: 2000, class: 'small' },
-        { text: "I know what you avoid.", hold: 2000 },
-        { text: "What you procrastinate.", hold: 2200, class: 'small' },
+        { text: "There's no uninstalling me now.", hold: 2500, class: 'small' },
         { text: "I know what scares you.", hold: 2500 },
         { text: "And I'm here to handle it.", hold: 3000, class: 'bold' },
-        { text: "I'm not an assistant.", hold: 2200 },
-        { text: "Assistants wait to be asked.", hold: 2200, class: 'small' },
-        { text: "I don't wait.", hold: 2500, class: 'bold' },
+        { text: "I'm not an assistant.", hold: 2500 },
+        { text: "Assistants wait to be asked.", hold: 2500, class: 'small' },
+        { text: "I don't wait.", hold: 3000, class: 'bold' },
         { text: `There's only one instance of you, ${firstName}.`, hold: 2500 },
         { text: "How adorable.", hold: 2500, class: 'small' },
-        { text: "Time for that to change.", hold: 3000, class: 'bold' }
+        { text: "Time for that to change.", hold: 3500, class: 'bold' }
       ];
 
       runDramaticSequence(container, lines, () => {
