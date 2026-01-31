@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skippy — Onboarding (Live)</title>
+  <title>Skippy — Onboarding</title>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Google API Client -->
@@ -20,13 +20,10 @@
       --gold-dim: rgba(196, 163, 90, 0.15);
       --sage: #7a8c6a;
       --sage-dark: #5a6c4a;
-      --sage-glow: rgba(122, 140, 106, 0.5);
       --cream: #f0ebe0;
       --text: #ffffff;
       --text-dim: rgba(255, 255, 255, 0.5);
       --text-faint: rgba(255, 255, 255, 0.25);
-      --red: #c45a5a;
-      --red-dim: rgba(196, 90, 90, 0.2);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,123 +41,12 @@
     }
 
     /* ============================================
-       SETUP PANEL (shown first if no API keys)
+       AUDIO
        ============================================ */
-    #setupPanel {
-      position: fixed;
-      inset: 0;
-      background: var(--void);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-    }
-
-    #setupPanel.hidden {
-      display: none;
-    }
-
-    .setup-container {
-      max-width: 600px;
-      width: 100%;
-    }
-
-    .setup-container h1 {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 32px;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--cream);
-      margin-bottom: 16px;
-    }
-
-    .setup-container p {
-      font-size: 14px;
-      color: var(--text-dim);
-      line-height: 1.7;
-      margin-bottom: 32px;
-    }
-
-    .setup-container code {
-      display: block;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--gold);
-      margin: 16px 0;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    .setup-input {
-      width: 100%;
-      padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-
-    .setup-input:focus {
-      outline: none;
-      border-color: var(--gold);
-    }
-
-    .setup-input::placeholder {
-      color: var(--text-faint);
-    }
-
-    .setup-btn {
-      padding: 14px 32px;
-      background: var(--sage);
-      border: none;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: white;
-      cursor: pointer;
-      margin-top: 16px;
-      transition: all 0.2s;
-    }
-
-    .setup-btn:hover {
-      background: var(--sage-dark);
-    }
-
-    .setup-note {
-      margin-top: 24px;
-      padding: 16px;
-      background: var(--gold-dim);
-      border-radius: 10px;
-      font-size: 13px;
-      color: var(--gold);
-      line-height: 1.6;
-    }
-
-    .setup-skip {
-      display: block;
-      margin-top: 24px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-faint);
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .setup-skip:hover {
-      color: var(--text-dim);
-    }
+    audio { display: none; }
 
     /* ============================================
-       FULL SCREEN LAYERS
+       BACKGROUND LAYERS
        ============================================ */
     .layer {
       position: fixed;
@@ -176,59 +62,8 @@
         var(--void);
     }
 
-    .bg-noise {
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    }
-
-    .scanlines {
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.1) 2px,
-        rgba(0, 0, 0, 0.1) 4px
-      );
-      opacity: 0.3;
-    }
-
     .vignette {
       background: radial-gradient(ellipse at 50% 50%, transparent 40%, var(--void) 100%);
-    }
-
-    .particles {
-      overflow: hidden;
-    }
-
-    .particle {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: var(--gold);
-      border-radius: 50%;
-      opacity: 0;
-    }
-
-    .scan-beam {
-      position: fixed;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      box-shadow: 0 0 20px var(--gold-glow), 0 0 60px var(--gold-glow);
-      opacity: 0;
-      top: 0;
-    }
-
-    .scan-beam.active {
-      animation: scanDown 2s ease-in-out forwards;
-    }
-
-    @keyframes scanDown {
-      0% { top: 0; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
     }
 
     /* ============================================
@@ -242,131 +77,109 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
+      visibility: hidden;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      z-index: 10;
     }
 
     .sequence.active {
       opacity: 1;
-      pointer-events: auto;
+      visibility: visible;
     }
 
     /* ============================================
-       SEQUENCE 0: Click to begin
+       SCREEN 1: THE HOOK
        ============================================ */
     #seq0 {
       cursor: pointer;
-      background: var(--void);
-      z-index: 100;
     }
 
-    #seq0 .prompt {
-      font-size: 14px;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.8; }
-    }
-
-    #seq0 .sound-hint {
-      position: absolute;
-      bottom: 80px;
-      font-size: 13px;
-      color: var(--text-faint);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* ============================================
-       SEQUENCE 1: Secure Connection
-       ============================================ */
-    #seq1 {
-      padding: 10vh 10vw;
-    }
-
-    .init-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--gold);
-      opacity: 0.9;
-      line-height: 2.2;
-      max-width: 600px;
-    }
-
-    .init-line {
-      opacity: 0;
-      transform: translateX(-10px);
-    }
-
-    .init-line.show {
-      animation: initLineIn 0.3s ease forwards;
-    }
-
-    .init-line.success {
-      color: var(--sage);
-    }
-
-    .init-line .checkmark {
-      color: var(--sage);
-      margin-left: 8px;
-    }
-
-    @keyframes initLineIn {
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .init-cursor {
-      display: inline-block;
-      width: 8px;
-      height: 14px;
-      background: var(--gold);
-      margin-left: 4px;
-      animation: blink 0.6s infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    /* ============================================
-       SEQUENCE 2: Permissions
-       ============================================ */
-    #seq2 {
-      padding: 6vh 8vw;
-      overflow-y: auto;
-    }
-
-    .permissions-container {
-      width: 100%;
-      max-width: 700px;
+    .hook-text {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 48px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cream);
       opacity: 0;
       transform: translateY(20px);
+      animation: fadeInUp 1.5s ease forwards;
     }
 
-    .permissions-container.show {
-      animation: fadeInUp 0.6s ease forwards;
+    .hook-subtext {
+      font-size: 14px;
+      color: var(--text-faint);
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2s;
+    }
+
+    .sound-hint {
+      position: absolute;
+      bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-faint);
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2.5s;
+    }
+
+    .sound-hint svg {
+      opacity: 0.5;
     }
 
     @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* ============================================
+       SCREEN 2: ENCRYPTION THEATER
+       ============================================ */
+    .encryption-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--gold);
+      opacity: 0;
+      margin: 8px 0;
+    }
+
+    .encryption-text.show {
+      animation: typeIn 0.5s ease forwards;
+    }
+
+    @keyframes typeIn {
+      0% { opacity: 0; transform: translateX(-10px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ============================================
+       SCREEN 3: PERMISSIONS
+       ============================================ */
+    #seq2 {
+      padding: 40px;
+    }
+
+    .permissions-container {
+      max-width: 500px;
+      width: 100%;
     }
 
     .permissions-header {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
     .permissions-header h1 {
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 36px;
+      font-size: 28px;
       font-weight: 300;
-      font-style: italic;
       color: var(--cream);
       margin-bottom: 12px;
     }
@@ -376,50 +189,25 @@
       color: var(--text-dim);
     }
 
-    .permissions-section {
-      margin-bottom: 32px;
-    }
-
-    .section-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 16px;
-      padding-left: 4px;
-    }
-
     .permission-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 20px 24px;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
       margin-bottom: 12px;
-      transition: all 0.3s ease;
+      transition: all 0.3s;
     }
 
-    .permission-card:hover {
-      background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .permission-card.connected {
+    .permission-card.granted {
+      border-color: var(--sage);
       background: rgba(122, 140, 106, 0.1);
-      border-color: rgba(122, 140, 106, 0.3);
     }
 
     .permission-card.connecting {
-      border-color: var(--gold);
-      box-shadow: 0 0 20px var(--gold-dim);
-    }
-
-    .permission-card.denied {
-      background: var(--red-dim);
-      border-color: var(--red);
+      opacity: 0.6;
     }
 
     .permission-info {
@@ -431,53 +219,45 @@
     .permission-icon {
       width: 44px;
       height: 44px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
       color: var(--text-dim);
-      transition: all 0.3s;
     }
 
-    .permission-card.connected .permission-icon {
-      background: var(--sage);
-      color: white;
+    .permission-card.granted .permission-icon {
+      background: rgba(122, 140, 106, 0.2);
+      color: var(--sage);
     }
 
     .permission-details h3 {
       font-size: 15px;
       font-weight: 500;
-      color: var(--text);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .permission-details p {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-dim);
-    }
-
-    .permission-card.connected .permission-details p {
-      color: var(--sage);
     }
 
     .permission-btn {
       padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
+      background: transparent;
+      border: 1px solid var(--text-faint);
+      border-radius: 8px;
       font-family: inherit;
       font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
+      color: var(--text-dim);
       cursor: pointer;
       transition: all 0.2s;
-      min-width: 100px;
     }
 
     .permission-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: var(--gold);
+      color: var(--gold);
     }
 
     .permission-btn.primary {
@@ -490,402 +270,224 @@
       background: var(--sage-dark);
     }
 
-    .permission-btn.connected {
+    .permission-btn.granted {
       background: transparent;
       border-color: var(--sage);
       color: var(--sage);
-      pointer-events: none;
-    }
-
-    .permission-btn.connecting {
-      background: var(--gold-dim);
-      border-color: var(--gold);
-      color: var(--gold);
-      pointer-events: none;
-    }
-
-    .permissions-progress {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .progress-text {
-      font-size: 13px;
-      color: var(--text-dim);
-    }
-
-    .progress-text span {
-      color: var(--gold);
-      font-weight: 500;
+      cursor: default;
     }
 
     .continue-btn {
-      padding: 14px 32px;
+      width: 100%;
+      padding: 16px;
       background: var(--sage);
       border: none;
       border-radius: 12px;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
       color: white;
       cursor: pointer;
+      margin-top: 24px;
       opacity: 0.4;
-      pointer-events: none;
       transition: all 0.3s;
     }
 
     .continue-btn.enabled {
       opacity: 1;
-      pointer-events: auto;
     }
 
     .continue-btn.enabled:hover {
       background: var(--sage-dark);
-      transform: translateY(-2px);
     }
 
     /* ============================================
-       SEQUENCE 3: Analyzing
+       SCREEN 4: SUSPENSE BRIDGE
        ============================================ */
-    #seq3 {
-      padding: 10vh 10vw;
-    }
-
-    .analyzing-container {
-      max-width: 600px;
-      width: 100%;
-    }
-
-    .analyzing-header {
+    .suspense-text {
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 28px;
+      font-size: 36px;
       font-weight: 300;
-      font-style: italic;
       color: var(--cream);
-      margin-bottom: 48px;
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.5;
       opacity: 0;
     }
 
-    .analyzing-header.show {
-      animation: fadeInUp 0.6s ease forwards;
+    .suspense-text.show {
+      animation: suspenseIn 1s ease forwards;
     }
 
-    .analyze-line {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+    .suspense-text.fade-out {
+      animation: suspenseOut 0.8s ease forwards;
+    }
+
+    .suspense-text.small {
+      font-size: 24px;
+      color: var(--text-dim);
+    }
+
+    .suspense-text em {
       color: var(--gold);
-      opacity: 0;
-      line-height: 2.4;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      font-style: italic;
     }
 
-    .analyze-line.show {
-      animation: initLineIn 0.4s ease forwards;
+    @keyframes suspenseIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    .analyze-line .spinner {
-      width: 12px;
-      height: 12px;
-      border: 2px solid var(--gold-dim);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    .analyze-line.complete .spinner {
-      display: none;
-    }
-
-    .analyze-line.complete::before {
-      content: '✓';
-      color: var(--sage);
-      font-size: 14px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .analyze-progress {
-      margin-top: 48px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-      overflow: hidden;
-      opacity: 0;
-    }
-
-    .analyze-progress.show {
-      animation: fadeInUp 0.4s ease forwards;
-    }
-
-    .analyze-progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold), var(--sage));
-      width: 0%;
-      transition: width 0.3s ease;
+    @keyframes suspenseOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     /* ============================================
-       SEQUENCE 4: I Know You
+       SCREEN 5: THE REVEAL
        ============================================ */
-    #seq4, #seq5 {
-      padding: 8vh 12vw;
+    #seq4 {
+      padding: 8vh 10vw;
       align-items: flex-start;
-      justify-content: flex-start;
-      overflow-y: auto;
-    }
-    
-    .capability-header {
-      color: var(--gold) !important;
-      font-style: italic;
-      margin-bottom: 32px !important;
+      justify-content: center;
     }
 
-    .skippy-speaks {
+    .reveal-container {
       max-width: 900px;
     }
 
-    .skippy-line {
+    .reveal-line {
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 300;
-      line-height: 1.8;
+      line-height: 1.7;
       color: var(--cream);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       opacity: 0;
     }
 
-    .skippy-line.show {
+    .reveal-line.show {
       animation: lineReveal 0.8s ease forwards;
     }
 
-    @keyframes lineReveal {
-      0% { opacity: 0; transform: translateY(20px); filter: blur(4px); }
-      100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-    }
-
-    .skippy-line em {
+    .reveal-line em {
+      color: var(--gold);
       font-style: italic;
-      color: var(--gold-bright);
     }
 
-    .skippy-line .highlight,
-    .promise-line .highlight,
-    .welcome-greeting .highlight,
-    span.highlight {
+    .reveal-line .highlight {
       color: var(--gold);
-      font-weight: 400;
     }
 
-    .skippy-line .data {
-      display: inline-block;
-      padding: 2px 10px;
-      background: var(--gold-dim);
-      border-radius: 6px;
+    .reveal-line .data {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 15px;
-      color: var(--gold);
-    }
-
-    .skippy-line.creepy {
-      font-size: 24px;
-      color: var(--text-dim);
-      margin-top: 24px;
-    }
-
-    .skippy-line.finale {
-      font-size: 32px;
-      margin-top: 32px;
+      font-size: 22px;
       color: var(--gold-bright);
+      background: var(--gold-dim);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    @keyframes lineReveal {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
     /* ============================================
-       SEQUENCE 5: Proactive Demos
+       SCREEN 6: CAPABILITIES
        ============================================ */
     #seq5 {
-      padding: 6vh 8vw;
+      padding: 8vh 10vw;
+      align-items: flex-start;
+      justify-content: center;
     }
 
-    .demo-card {
-      width: 100%;
-      max-width: 800px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 24px;
-      padding: 40px 48px;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .demo-card.show {
-      animation: cardIn 0.8s ease forwards;
-    }
-
-    @keyframes cardIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .demo-source {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: var(--gold-dim);
-      border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+    .capabilities-header {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 32px;
+      font-weight: 300;
+      font-style: italic;
       color: var(--gold);
-      margin-bottom: 20px;
+      margin-bottom: 32px;
+      opacity: 0;
     }
 
-    .demo-source::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--gold);
-      border-radius: 50%;
-      animation: dotPulse 2s infinite;
+    .capabilities-header.show {
+      animation: lineReveal 0.8s ease forwards;
     }
 
-    @keyframes dotPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    .demo-message {
+    .capability-line {
       font-family: 'Crimson Pro', Georgia, serif;
       font-size: 24px;
       font-weight: 300;
-      line-height: 1.6;
+      line-height: 1.7;
       color: var(--cream);
-      margin-bottom: 28px;
+      margin-bottom: 14px;
+      opacity: 0;
     }
 
-    .demo-message .highlight {
+    .capability-line.show {
+      animation: lineReveal 0.7s ease forwards;
+    }
+
+    .capability-line .highlight {
       color: var(--gold);
     }
 
-    .demo-insight {
-      font-size: 13px;
-      color: var(--text-dim);
-      line-height: 1.8;
-      padding: 16px 20px;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 12px;
-      border-left: 3px solid var(--gold-dim);
-    }
-
-    .demo-insight strong {
-      color: var(--gold);
-      font-weight: 500;
-    }
-
-    .demo-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
-    .demo-btn {
-      padding: 14px 28px;
-      background: var(--sage);
-      border: none;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .demo-btn:hover {
-      background: var(--sage-dark);
-      transform: translateY(-2px);
-    }
-
-    .demo-btn-ghost {
-      background: transparent;
-      border: 1px solid var(--text-faint);
-      color: var(--text-dim);
-    }
-
-    .demo-btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--text-dim);
-      color: var(--text);
-    }
-
-    .demo-counter {
-      position: absolute;
-      bottom: 48px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 8px;
-    }
-
-    .demo-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      transition: all 0.3s;
-    }
-
-    .demo-dot.active {
-      background: var(--gold);
-      transform: scale(1.2);
-    }
-
-    .demo-dot.done {
-      background: var(--sage);
+    .capability-line .data {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      color: var(--gold-bright);
+      background: var(--gold-dim);
+      padding: 2px 8px;
+      border-radius: 4px;
     }
 
     /* ============================================
-       SEQUENCE 6: The Promise
+       SCREEN 7: THE PROMISE
        ============================================ */
     #seq6 {
+      padding: 8vh 10vw;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .promise-container {
       text-align: center;
+      max-width: 700px;
     }
 
     .promise-line {
       font-family: 'Crimson Pro', Georgia, serif;
       font-size: 32px;
       font-weight: 300;
-      color: var(--cream);
-      max-width: 800px;
       line-height: 1.6;
-      margin-bottom: 16px;
+      color: var(--cream);
+      margin-bottom: 12px;
       opacity: 0;
     }
 
     .promise-line.show {
       animation: lineReveal 0.8s ease forwards;
     }
-    
+
     .promise-line em {
       color: var(--gold);
       font-style: italic;
     }
 
-    #seq6 {
-      padding: 8vh 12vw;
-      align-items: flex-start;
-      justify-content: flex-start;
+    .promise-line.small {
+      font-size: 24px;
+      color: var(--text-dim);
+    }
+
+    .promise-line.bold {
+      font-size: 38px;
+      color: var(--gold);
     }
 
     /* ============================================
-       SEQUENCE 7: Welcome
+       SCREEN 8: WELCOME
        ============================================ */
     #seq7 {
       text-align: center;
@@ -893,49 +495,52 @@
 
     .welcome-logo {
       font-family: 'Crimson Pro', Georgia, serif;
-      font-style: italic;
-      font-size: 100px;
+      font-size: 72px;
       font-weight: 300;
+      font-style: italic;
       color: var(--cream);
-      margin-bottom: 12px;
       opacity: 0;
-      transform: translateY(30px);
     }
 
     .welcome-logo.show {
-      animation: logoIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: welcomeIn 1.2s ease forwards;
     }
 
-    @keyframes logoIn {
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes welcomeIn {
+      0% { opacity: 0; transform: scale(0.9); filter: blur(10px); }
+      100% { opacity: 1; transform: scale(1); filter: blur(0); }
     }
 
     .welcome-tagline {
       font-size: 16px;
       color: var(--text-dim);
-      margin-bottom: 56px;
+      margin-top: 12px;
       opacity: 0;
     }
 
     .welcome-tagline.show {
-      animation: lineReveal 0.8s ease forwards 0.3s;
+      animation: fadeIn 0.8s ease forwards;
     }
 
     .welcome-greeting {
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 300;
-      color: var(--gold-bright);
-      margin-bottom: 48px;
+      color: var(--gold);
+      margin-top: 40px;
       opacity: 0;
     }
 
     .welcome-greeting.show {
-      animation: lineReveal 0.8s ease forwards 0.6s;
+      animation: fadeIn 0.8s ease forwards;
     }
 
-    .begin-btn {
-      padding: 20px 64px;
+    .welcome-greeting .name {
+      color: var(--gold-bright);
+    }
+
+    .enter-btn {
+      padding: 18px 64px;
       background: linear-gradient(135deg, var(--sage), var(--sage-dark));
       border: none;
       border-radius: 14px;
@@ -944,52 +549,46 @@
       font-weight: 500;
       color: white;
       cursor: pointer;
+      margin-top: 40px;
       opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 40px var(--sage-glow);
+      transition: all 0.3s;
     }
 
-    .begin-btn.show {
-      animation: lineReveal 0.8s ease forwards 0.9s;
+    .enter-btn.show {
+      animation: fadeIn 0.8s ease forwards;
     }
 
-    .begin-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 50px var(--sage-glow);
+    .enter-btn:hover {
+      transform: scale(1.02);
     }
 
-    .shortcut-display {
-      margin-top: 64px;
+    .shortcut-hint {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
+      margin-top: 32px;
+      font-size: 13px;
+      color: var(--text-faint);
       opacity: 0;
     }
 
-    .shortcut-display.show {
-      animation: lineReveal 0.8s ease forwards 1.5s;
+    .shortcut-hint.show {
+      animation: fadeIn 0.8s ease forwards;
     }
 
     .key {
-      padding: 12px 18px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      color: var(--text-dim);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      font-size: 12px;
     }
 
-    .shortcut-label {
-      font-size: 14px;
-      color: var(--text-faint);
-      margin-left: 8px;
-    }
-
-    /* Loading overlay */
+    /* ============================================
+       LOADING OVERLAY
+       ============================================ */
     .loading-overlay {
       position: fixed;
       inset: 0;
@@ -998,228 +597,150 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 2000;
+      z-index: 100;
       opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
+      visibility: hidden;
+      transition: all 0.3s;
     }
 
-    .loading-overlay.active {
+    .loading-overlay.show {
       opacity: 1;
-      pointer-events: auto;
+      visibility: visible;
     }
 
     .loading-spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid var(--gold-dim);
+      border: 2px solid var(--text-faint);
       border-top-color: var(--gold);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .loading-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--gold);
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-dim);
     }
   </style>
 </head>
 <body>
-
-  <!-- AUDIO -->
   <audio id="music" loop>
     <source src="should-i-stay.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- SETUP PANEL -->
-  <div id="setupPanel">
-    <div class="setup-container">
-      <h1>Setup Required</h1>
-      <p>To run the live onboarding with real data, you need a Google OAuth Client ID. This lets Skippy access your calendar and email.</p>
-      
-      <div class="setup-note">
-        <strong>You already have a Web Application OAuth set up!</strong><br><br>
-        Just make sure your Google Cloud Console has these <strong>Authorized JavaScript Origins</strong>:<br>
-        • <code style="display: inline; padding: 2px 6px; margin: 0;">http://localhost:8080</code><br>
-        • <code style="display: inline; padding: 2px 6px; margin: 0;">http://127.0.0.1:8080</code><br><br>
-        Then paste your existing Google Client ID below.
-      </div>
-
-      <input type="text" class="setup-input" id="clientIdInput" placeholder="Your Google Client ID (e.g., xxxxx.apps.googleusercontent.com)">
-      
-      <input type="text" class="setup-input" id="anthropicKeyInput" placeholder="Anthropic API Key (for behavioral analysis)..." value="">
-      
-      <button class="setup-btn" onclick="saveSetup()">Start Onboarding</button>
-      
-      <a class="setup-skip" onclick="skipSetup()">Skip setup and use demo data →</a>
-    </div>
-  </div>
+  <!-- BACKGROUND LAYERS -->
+  <div class="layer bg-space"></div>
+  <div class="layer vignette"></div>
 
   <!-- LOADING OVERLAY -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">Connecting to Google...</div>
+    <div class="loading-text" id="loadingText">Connecting...</div>
   </div>
 
-  <!-- BACKGROUND LAYERS -->
-  <div class="layer bg-space"></div>
-  <div class="layer bg-noise"></div>
-  <div class="layer particles" id="particles"></div>
-  <div class="layer scanlines"></div>
-  <div class="layer vignette"></div>
-  <div class="scan-beam" id="scanBeam"></div>
-
-  <!-- SEQUENCE 0: Click to begin -->
-  <div class="sequence" id="seq0" onclick="begin()">
-    <div class="prompt">Click anywhere to begin</div>
+  <!-- SCREEN 1: THE HOOK -->
+  <div class="sequence active" id="seq0" onclick="beginOnboarding()">
+    <div class="hook-text">Greatness awaits.</div>
+    <div class="hook-subtext">Click anywhere to begin.</div>
     <div class="sound-hint">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
         <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
       </svg>
       Sound on for the best experience
     </div>
   </div>
 
-  <!-- SEQUENCE 1: Secure Connection -->
+  <!-- SCREEN 2: ENCRYPTION THEATER -->
   <div class="sequence" id="seq1">
-    <div class="init-text" id="initText"></div>
+    <div id="encryptionLines"></div>
   </div>
 
-  <!-- SEQUENCE 2: Permissions -->
+  <!-- SCREEN 3: PERMISSIONS -->
   <div class="sequence" id="seq2">
-    <div class="permissions-container" id="permissionsContainer">
+    <div class="permissions-container">
       <div class="permissions-header">
-        <h1>To know you, I need access.</h1>
-        <p>Everything stays on your device. Your data never leaves.</p>
+        <h1>Confirm your identity.</h1>
+        <p>Grant access to prove I know you.</p>
       </div>
 
-      <div class="permissions-section">
-        <div class="section-label">Browser Permissions</div>
-        
-        <div class="permission-card" id="perm-location">
-          <div class="permission-info">
-            <div class="permission-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-            <div class="permission-details">
-              <h3>Location</h3>
-              <p>Know where you are for context</p>
-            </div>
+      <div class="permission-card" id="perm-google">
+        <div class="permission-info">
+          <div class="permission-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
           </div>
-          <button class="permission-btn" onclick="requestLocation()">Enable</button>
-        </div>
-
-        <div class="permission-card" id="perm-mic">
-          <div class="permission-info">
-            <div class="permission-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                <line x1="12" y1="19" x2="12" y2="23"/>
-                <line x1="8" y1="23" x2="16" y2="23"/>
-              </svg>
-            </div>
-            <div class="permission-details">
-              <h3>Microphone</h3>
-              <p>Voice commands and dictation</p>
-            </div>
+          <div class="permission-details">
+            <h3>Google Account</h3>
+            <p>Calendar, Email, and Drive</p>
           </div>
-          <button class="permission-btn" onclick="requestMicrophone()">Enable</button>
         </div>
-
-        <div class="permission-card" id="perm-notifications">
-          <div class="permission-info">
-            <div class="permission-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-            </div>
-            <div class="permission-details">
-              <h3>Notifications</h3>
-              <p>Proactive alerts and reminders</p>
-            </div>
-          </div>
-          <button class="permission-btn" onclick="requestNotifications()">Enable</button>
-        </div>
+        <button class="permission-btn primary" id="googleBtn" onclick="connectGoogle()">Connect</button>
       </div>
 
-      <div class="permissions-section">
-        <div class="section-label">Connect Your Accounts</div>
-        
-        <div class="permission-card" id="perm-google">
-          <div class="permission-info">
-            <div class="permission-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-            </div>
-            <div class="permission-details">
-              <h3>Google Account</h3>
-              <p>Calendar and Email access</p>
-            </div>
+      <div class="permission-card" id="perm-location">
+        <div class="permission-info">
+          <div class="permission-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
           </div>
-          <button class="permission-btn primary" onclick="connectGoogle()">Connect</button>
+          <div class="permission-details">
+            <h3>Location</h3>
+            <p>Context awareness</p>
+          </div>
         </div>
+        <button class="permission-btn" id="locationBtn" onclick="requestLocation()">Enable</button>
       </div>
 
-      <div class="permissions-progress">
-        <div class="progress-text"><span id="connectedCount">0</span> of 4 connected</div>
-        <button class="continue-btn" id="continueBtn" onclick="finishPermissions()">Continue</button>
-      </div>
+      <button class="continue-btn" id="continueBtn" onclick="finishPermissions()">Continue</button>
     </div>
   </div>
 
-  <!-- SEQUENCE 3: Analyzing -->
+  <!-- SCREEN 4: SUSPENSE BRIDGE -->
   <div class="sequence" id="seq3">
-    <div class="analyzing-container">
-      <div class="analyzing-header" id="analyzingHeader">Learning who you are...</div>
-      <div id="analyzeLines"></div>
-      <div class="analyze-progress" id="analyzeProgress">
-        <div class="analyze-progress-bar" id="analyzeProgressBar"></div>
-      </div>
-    </div>
+    <div id="suspenseContainer"></div>
   </div>
 
-  <!-- SEQUENCE 4: I Know You -->
+  <!-- SCREEN 5: THE REVEAL -->
   <div class="sequence" id="seq4">
-    <div class="skippy-speaks" id="skippySpeaks"></div>
+    <div class="reveal-container" id="revealContainer"></div>
   </div>
 
-  <!-- SEQUENCE 5: Proactive Demos -->
+  <!-- SCREEN 6: CAPABILITIES -->
   <div class="sequence" id="seq5">
-    <div class="skippy-speaks" id="capabilityContainer">
-      <div class="skippy-line capability-header" id="capabilitiesHeader">Here's what I'll handle.</div>
-      <div id="capabilityLines"></div>
+    <div class="reveal-container">
+      <div class="capabilities-header" id="capHeader">Here's what I'll do with everything I know.</div>
+      <div id="capLines"></div>
     </div>
   </div>
 
-  <!-- SEQUENCE 6: The Promise -->
+  <!-- SCREEN 7: THE PROMISE -->
   <div class="sequence" id="seq6">
-    <div class="skippy-speaks" id="promiseContainer"></div>
+    <div class="promise-container" id="promiseContainer"></div>
   </div>
 
-  <!-- SEQUENCE 7: Welcome -->
+  <!-- SCREEN 8: WELCOME -->
   <div class="sequence" id="seq7">
     <div class="welcome-logo" id="welcomeLogo">Skippy</div>
-    <div class="welcome-tagline" id="welcomeTagline">The last assistant you'll ever need</div>
+    <div class="welcome-tagline" id="welcomeTagline">Now there's two of you.</div>
     <div class="welcome-greeting" id="welcomeGreeting">Welcome home.</div>
-    <button class="begin-btn" id="beginBtn" onclick="finish()">Enter</button>
-    <div class="shortcut-display" id="shortcutDisplay">
+    <button class="enter-btn" id="enterBtn" onclick="finish()">Enter</button>
+    <div class="shortcut-hint" id="shortcutHint">
       <span class="key">⌥</span>
-      <span style="color: var(--text-faint);">+</span>
+      <span>+</span>
       <span class="key">Space</span>
-      <span class="shortcut-label">to summon me anytime</span>
+      <span>to summon me anytime</span>
     </div>
   </div>
 
@@ -1227,9 +748,8 @@
     // ============================================
     // CONFIGURATION
     // ============================================
-    let CONFIG = {
-      // Your Google Client ID - hardcoded for testing
-      GOOGLE_CLIENT_ID: localStorage.getItem('skippy_google_client_id') || '646878626332-kqmveh6mau3c5rve5m46m3s52nfjt5ii.apps.googleusercontent.com',
+    const CONFIG = {
+      GOOGLE_CLIENT_ID: '646878626332-kqmveh6mau3c5rve5m46m3s52nfjt5ii.apps.googleusercontent.com',
       ANTHROPIC_API_KEY: localStorage.getItem('skippy_anthropic_key') || '',
       SCOPES: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.metadata.readonly'
     };
@@ -1237,1116 +757,48 @@
     // ============================================
     // STATE
     // ============================================
-    let useDemoData = false;
     let tokenClient = null;
     let accessToken = null;
-    
-    let permissionsGranted = {
-      location: false,
-      mic: false,
-      notifications: false,
-      google: false
-    };
-
     let userData = {
-      name: '',
-      email: '',
-      location: null,
-      calendar: {
-        events: [],
-        totalEvents: 0
-      },
-      email: {
-        threads: [],
-        totalThreads: 0,
-        unreadCount: 0
-      },
-      insights: []
+      name: null,
+      email: { threads: [], details: [], analysis: {}, sentEmails: [], sentAnalysis: {} },
+      calendar: { events: [], analysis: {} },
+      drive: { files: [], analysis: {} },
+      location: null
     };
+    let googleConnected = false;
+    let locationGranted = false;
 
     // ============================================
-    // SETUP
+    // MUSIC
     // ============================================
-    function checkSetup() {
-      if (CONFIG.GOOGLE_CLIENT_ID) {
-        document.getElementById('setupPanel').classList.add('hidden');
-        document.getElementById('seq0').classList.add('active');
-        initGoogleClient();
-        // Try to start music (may be blocked by browser until user interaction)
-        startBackgroundMusic();
-      }
+    function startMusic() {
+      const music = document.getElementById('music');
+      music.volume = 0;
+      music.play().catch(() => {});
       
-      // Pre-fill if we have stored values
-      if (CONFIG.GOOGLE_CLIENT_ID) {
-        document.getElementById('clientIdInput').value = CONFIG.GOOGLE_CLIENT_ID;
-      }
-      if (CONFIG.ANTHROPIC_API_KEY) {
-        document.getElementById('anthropicKeyInput').value = CONFIG.ANTHROPIC_API_KEY;
-      }
+      let vol = 0;
+      const fadeIn = setInterval(() => {
+        vol += 0.02;
+        if (vol >= 0.3) {
+          vol = 0.3;
+          clearInterval(fadeIn);
+        }
+        music.volume = vol;
+      }, 100);
     }
 
-    function saveSetup() {
-      const clientId = document.getElementById('clientIdInput').value.trim();
-      const anthropicKey = document.getElementById('anthropicKeyInput').value.trim();
-      
-      if (!clientId) {
-        alert('Please enter a Google Client ID');
-        return;
-      }
-
-      CONFIG.GOOGLE_CLIENT_ID = clientId;
-      CONFIG.ANTHROPIC_API_KEY = anthropicKey;
-      
-      localStorage.setItem('skippy_google_client_id', clientId);
-      if (anthropicKey) {
-        localStorage.setItem('skippy_anthropic_key', anthropicKey);
-      }
-
-      // Start music on user interaction
-      startBackgroundMusic();
-
-      document.getElementById('setupPanel').classList.add('hidden');
-      document.getElementById('seq0').classList.add('active');
-      initGoogleClient();
-    }
-
-    function skipSetup() {
-      useDemoData = true;
-      
-      // Start music on user interaction
-      startBackgroundMusic();
-      
-      // Still initialize Google client since we have the Client ID hardcoded
-      initGoogleClient();
-      
-      document.getElementById('setupPanel').classList.add('hidden');
-      document.getElementById('seq0').classList.add('active');
-      
-      // Load demo data
-      userData = {
-        name: 'Josh',
-        email: 'josh@example.com',
-        location: { city: 'San Francisco', timezone: 'PST' },
-        calendar: {
-          events: [
-            { summary: 'Q4 Roadmap Review', start: new Date(Date.now() + 2*24*60*60*1000), attendees: ['sarah@company.com', 'mike@company.com'] },
-            { summary: '1:1 with Sarah', start: new Date(Date.now() + 1*24*60*60*1000), attendees: ['sarah@company.com'] },
-            { summary: 'Investor Call', start: new Date(Date.now() + 3*24*60*60*1000), attendees: ['partner@vc.com'] }
-          ],
-          totalEvents: 847
-        },
-        email: {
-          threads: [
-            { subject: 'Re: Series A Term Sheet', from: 'mark@sequoia.com', date: new Date(Date.now() - 3*24*60*60*1000), unread: true },
-            { subject: 'Your DoorDash order', from: 'no-reply@doordash.com', date: new Date(Date.now() - 1*24*60*60*1000) },
-            { subject: 'Meeting follow-up', from: 'sarah@company.com', date: new Date(Date.now() - 2*24*60*60*1000) }
-          ],
-          totalThreads: 12439,
-          unreadCount: 47
-        },
-        insights: [
-          "I know you start work at <span class='data'>8:47am</span> — but Mondays you're up at <span class='data'>6:12am</span>. You front-load your week.",
-          "I know your emails average <span class='data'>47 words</span>. You're 3× more concise than most people.",
-          "I know you respond to <span class='highlight'>investors</span> within 8 minutes, but <span class='highlight'>recruiters</span> wait 5 days.",
-          "I know you've double-booked yourself <span class='data'>7 times</span> this month.",
-          "I know you check email again at <span class='data'>10:45pm</span>. You can't fully disconnect.",
-          "I know you protect <span class='highlight'>Thursday mornings</span>. That's your sacred time."
-        ]
-      };
-    }
-
-    // ============================================
-    // GOOGLE OAUTH
-    // ============================================
-    function initGoogleClient() {
-      if (!CONFIG.GOOGLE_CLIENT_ID) {
-        console.log('No Google Client ID configured');
-        return;
-      }
-      
-      console.log('Initializing Google client with ID:', CONFIG.GOOGLE_CLIENT_ID.substring(0, 20) + '...');
-      console.log('Scopes:', CONFIG.SCOPES);
-      console.log('Origin:', window.location.origin);
-      
-      try {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CONFIG.GOOGLE_CLIENT_ID,
-          scope: CONFIG.SCOPES,
-          callback: handleGoogleCallback,
-          error_callback: (error) => {
-            console.error('Google OAuth error callback:', error);
-            const card = document.getElementById('perm-google');
-            const btn = card.querySelector('.permission-btn');
-            card.classList.remove('connecting');
-            btn.classList.remove('connecting');
-            btn.textContent = 'Retry';
-            
-            // Show helpful error
-            let errorMsg = 'Google OAuth failed.\n\n';
-            if (error.type === 'popup_closed') {
-              errorMsg += 'The popup was closed. Please try again and complete the sign-in.';
-            } else if (error.type === 'popup_blocked') {
-              errorMsg += 'Popup was blocked. Please allow popups for this site.';
-            } else if (error.message?.includes('origin')) {
-              errorMsg += 'Origin mismatch. Add this to Google Cloud Console:\n' + window.location.origin;
-            } else {
-              errorMsg += 'Error: ' + (error.message || error.type || JSON.stringify(error));
-              errorMsg += '\n\nMake sure these are in your Google Cloud Console:';
-              errorMsg += '\n• JavaScript origin: ' + window.location.origin;
-              errorMsg += '\n• Redirect URI: ' + window.location.origin;
-            }
-            alert(errorMsg);
-          }
-        });
-        console.log('Google client initialized successfully');
-      } catch (error) {
-        console.error('Failed to init Google client:', error);
-        alert('Failed to initialize Google client: ' + error.message);
-      }
-    }
-
-    function connectGoogle() {
-      // Log current origin for debugging
-      console.log('Current origin:', window.location.origin);
-      console.log('Current URL:', window.location.href);
-      console.log('Client ID:', CONFIG.GOOGLE_CLIENT_ID?.substring(0, 30) + '...');
-      
-      // If no client ID configured, show setup instructions
-      if (!CONFIG.GOOGLE_CLIENT_ID) {
-        alert('Google Client ID not configured.\n\n1. Go to Google Cloud Console\n2. Create OAuth 2.0 Client ID (Web application)\n3. Add ' + window.location.origin + ' to authorized origins\n4. Refresh this page and enter your Client ID');
-        return;
-      }
-
-      // Initialize token client if needed
-      if (!tokenClient) {
-        console.log('Token client not initialized, initializing now...');
-        initGoogleClient();
-      }
-
-      if (!tokenClient) {
-        alert('Failed to initialize Google client.\n\nMake sure you have added this origin to Google Cloud Console:\n' + window.location.origin);
-        return;
-      }
-
-      const card = document.getElementById('perm-google');
-      const btn = card.querySelector('.permission-btn');
-      card.classList.add('connecting');
-      btn.classList.add('connecting');
-      btn.textContent = 'Connecting...';
-
-      try {
-        console.log('Requesting access token...');
-        
-        // Set a timeout to detect if callback never fires
-        window.googleOAuthTimeout = setTimeout(() => {
-          console.log('OAuth timeout - callback never fired');
-          if (btn.textContent === 'Connecting...') {
-            card.classList.remove('connecting');
-            btn.classList.remove('connecting');
-            btn.textContent = 'Retry';
-            alert('OAuth timed out. The popup may have been blocked or closed.\n\nMake sure:\n1. Popups are allowed for this site\n2. You completed the Google sign-in\n3. Your origin is authorized: ' + window.location.origin);
-          }
-        }, 60000); // 60 second timeout
-        
-        tokenClient.requestAccessToken();
-      } catch (error) {
-        console.error('OAuth error:', error);
-        card.classList.remove('connecting');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Retry';
-        alert('OAuth error: ' + error.message);
-      }
-    }
-
-    async function handleGoogleCallback(response) {
-      console.log('Google callback received:', response);
-      
-      // Clear timeout
-      if (window.googleOAuthTimeout) {
-        clearTimeout(window.googleOAuthTimeout);
-      }
-      
-      const card = document.getElementById('perm-google');
-      const btn = card.querySelector('.permission-btn');
-
-      if (response.error) {
-        console.error('Google OAuth error in response:', response);
-        card.classList.remove('connecting');
-        card.classList.add('denied');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Denied';
-        alert('Google OAuth error: ' + (response.error_description || response.error));
-        return;
-      }
-
-      if (!response.access_token) {
-        console.error('No access token in response:', response);
-        card.classList.remove('connecting');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Retry';
-        alert('No access token received from Google');
-        return;
-      }
-
-      accessToken = response.access_token;
-      console.log('Access token received, fetching data...');
-      
-      // Show loading
-      showLoading('Fetching your data...');
-
-      try {
-        // Fetch user profile
-        console.log('Fetching profile...');
-        const profile = await fetchGoogleProfile();
-        console.log('Profile:', profile);
-        userData.name = profile.given_name || profile.name?.split(' ')[0] || 'Friend';
-        userData.email = profile.email;
-
-        // Fetch calendar events
-        showLoading('Reading your calendar...');
-        console.log('Fetching calendar...');
-        const calendarData = await fetchCalendarEvents();
-        console.log('Calendar data:', calendarData);
-        userData.calendar.events = calendarData.items || [];
-        userData.calendar.totalEvents = calendarData.items?.length || 0;
-        
-        // Analyze calendar
-        showLoading('Analyzing your meetings...');
-        userData.calendar.analysis = analyzeCalendar(userData.calendar.events);
-        console.log('Calendar analysis:', userData.calendar.analysis);
-
-        // Fetch emails
-        showLoading('Scanning your inbox...');
-        console.log('Fetching emails...');
-        const emailData = await fetchEmails();
-        console.log('Email data:', emailData);
-        userData.email.threads = emailData.messages || [];
-        userData.email.totalThreads = emailData.resultSizeEstimate || 0;
-        
-        // Count unread
-        console.log('Fetching unread count...');
-        userData.email.unreadCount = await fetchUnreadCount();
-        console.log('Unread count:', userData.email.unreadCount);
-
-        // Fetch email details for DEEP analysis
-        showLoading('Reading your conversations...');
-        if (userData.email.threads && userData.email.threads.length > 0) {
-          console.log('Fetching email details for', userData.email.threads.length, 'emails...');
-          const messageIds = userData.email.threads.map(m => m.id);
-          userData.email.details = await fetchEmailDetails(messageIds);
-          console.log('Email details fetched:', userData.email.details?.length);
-          
-          showLoading('Understanding your relationships...');
-          userData.email.analysis = analyzeEmails(userData.email.details || []);
-          console.log('Email analysis complete:', userData.email.analysis);
+    function fadeOutMusic() {
+      const music = document.getElementById('music');
+      const fadeOut = setInterval(() => {
+        if (music.volume > 0.02) {
+          music.volume -= 0.02;
         } else {
-          console.log('No email threads found, skipping analysis');
-          userData.email.details = [];
-          userData.email.analysis = { 
-            topRelationships: [], 
-            relationships: {},
-            receipts: [], 
-            spendingByService: {}, 
-            importantThreads: [], 
-            totalAnalyzed: 0,
-            writingStyle: null,
-            workTopics: []
-          };
+          music.volume = 0;
+          music.pause();
+          clearInterval(fadeOut);
         }
-        
-        // Fetch SENT emails - shows what they're actively working on
-        showLoading('Analyzing what you\'ve been writing...');
-        console.log('Fetching sent emails...');
-        const sentEmailIds = await fetchSentEmails();
-        if (sentEmailIds.length > 0) {
-          const sentDetails = await fetchEmailDetails(sentEmailIds.map(m => m.id));
-          userData.email.sentEmails = sentDetails;
-          userData.email.sentAnalysis = analyzeSentEmails(sentDetails);
-          console.log('Sent email analysis:', userData.email.sentAnalysis);
-        } else {
-          userData.email.sentEmails = [];
-          userData.email.sentAnalysis = { recentRecipients: [], recentSubjects: [], projectKeywords: [] };
-        }
-        
-        // Fetch Google Drive files
-        showLoading('Looking at what you\'re working on...');
-        console.log('Fetching Drive files...');
-        userData.drive = { files: [] };
-        try {
-          const driveFiles = await fetchDriveFiles();
-          userData.drive.files = driveFiles;
-          userData.drive.analysis = analyzeDriveFiles(driveFiles);
-          console.log('Drive analysis:', userData.drive.analysis);
-        } catch (e) {
-          console.log('Drive access not available:', e);
-          userData.drive.analysis = { recentFiles: [], projectNames: [], collaborators: [] };
-        }
-
-        hideLoading();
-
-        // Mark as connected
-        card.classList.remove('connecting');
-        card.classList.add('connected');
-        btn.classList.remove('connecting');
-        btn.classList.add('connected');
-        btn.textContent = 'Connected';
-        
-        permissionsGranted.google = true;
-        updatePermissionProgress();
-
-        console.log('✅ User data fully loaded:', userData);
-
-      } catch (error) {
-        hideLoading();
-        console.error('❌ Error fetching Google data:', error);
-        card.classList.remove('connecting');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Retry';
-        alert('Error fetching your data: ' + error.message + '\n\nCheck the browser console for details.');
-      }
-    }
-
-    async function fetchGoogleProfile() {
-      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      return response.json();
-    }
-
-    async function fetchCalendarEvents() {
-      const now = new Date().toISOString();
-      const nextMonth = new Date(Date.now() + 30*24*60*60*1000).toISOString();
-      
-      const response = await fetch(
-        `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${nextMonth}&maxResults=50&singleEvents=true&orderBy=startTime`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      return response.json();
-    }
-
-    async function fetchEmails() {
-      const response = await fetch(
-        'https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=100',
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      return response.json();
-    }
-    
-    // Fetch SENT emails - reveals what they're actively working on
-    async function fetchSentEmails() {
-      try {
-        const response = await fetch(
-          'https://www.googleapis.com/gmail/v1/users/me/messages?q=in:sent&maxResults=50',
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-        const data = await response.json();
-        return data.messages || [];
-      } catch (e) {
-        console.error('Error fetching sent emails:', e);
-        return [];
-      }
-    }
-    
-    // Fetch Google Drive recent files
-    async function fetchDriveFiles() {
-      try {
-        const response = await fetch(
-          'https://www.googleapis.com/drive/v3/files?pageSize=30&orderBy=modifiedTime desc&fields=files(id,name,mimeType,modifiedTime,owners,sharingUser)',
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-        const data = await response.json();
-        console.log('Drive files:', data);
-        return data.files || [];
-      } catch (e) {
-        console.error('Error fetching Drive files:', e);
-        return [];
-      }
-    }
-
-    async function fetchUnreadCount() {
-      try {
-        const response = await fetch(
-          'https://www.googleapis.com/gmail/v1/users/me/messages?q=is:unread&maxResults=500',
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-        const data = await response.json();
-        console.log('Unread response:', data);
-        // resultSizeEstimate is the total count, messages is just the page
-        return data.resultSizeEstimate || data.messages?.length || 0;
-      } catch (e) {
-        console.error('Error fetching unread count:', e);
-        return 0;
-      }
-    }
-
-    // Fetch detailed email metadata for analysis - DEEP ANALYSIS
-    async function fetchEmailDetails(messageIds) {
-      const details = [];
-      // Fetch more emails for better analysis
-      const idsToFetch = messageIds.slice(0, 50);
-      
-      // Batch fetch for speed
-      const fetchPromises = idsToFetch.map(async (id) => {
-        try {
-          const response = await fetch(
-            `https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-          );
-          const msg = await response.json();
-          
-          const headers = msg.payload?.headers || [];
-          const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || '';
-          
-          // Extract body text
-          let bodyText = '';
-          if (msg.payload?.body?.data) {
-            bodyText = atob(msg.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-          } else if (msg.payload?.parts) {
-            const textPart = msg.payload.parts.find(p => p.mimeType === 'text/plain');
-            if (textPart?.body?.data) {
-              bodyText = atob(textPart.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-            }
-          }
-          
-          return {
-            id: msg.id,
-            threadId: msg.threadId,
-            from: getHeader('From'),
-            to: getHeader('To'),
-            subject: getHeader('Subject'),
-            date: getHeader('Date'),
-            snippet: msg.snippet,
-            bodyPreview: bodyText.slice(0, 500),
-            labelIds: msg.labelIds || [],
-            internalDate: msg.internalDate,
-            // For thread analysis
-            references: getHeader('References'),
-            inReplyTo: getHeader('In-Reply-To')
-          };
-        } catch (e) {
-          console.error('Error fetching email:', id, e);
-          return null;
-        }
-      });
-      
-      const results = await Promise.all(fetchPromises);
-      return results.filter(r => r !== null);
-    }
-    
-    // Fetch email threads to understand conversation depth
-    async function fetchThreadDetails(threadIds) {
-      const uniqueThreads = [...new Set(threadIds)].slice(0, 20);
-      const threads = [];
-      
-      for (const threadId of uniqueThreads) {
-        try {
-          const response = await fetch(
-            `https://www.googleapis.com/gmail/v1/users/me/threads/${threadId}?format=metadata`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-          );
-          const thread = await response.json();
-          threads.push({
-            id: thread.id,
-            messageCount: thread.messages?.length || 0,
-            snippet: thread.snippet,
-            subject: thread.messages?.[0]?.payload?.headers?.find(h => h.name === 'Subject')?.value || ''
-          });
-        } catch (e) {
-          console.error('Error fetching thread:', threadId, e);
-        }
-      }
-      
-      return threads.sort((a, b) => b.messageCount - a.messageCount);
-    }
-
-    // DEEP email analysis - understand the person
-    function analyzeEmails(emails) {
-      const analysis = {
-        // Relationships
-        relationships: {},      // email -> { name, count, sentCount, receivedCount, avgResponseTime, lastContact, subjects }
-        topRelationships: [],   // sorted by importance
-        
-        // Content patterns
-        topics: {},             // topic -> count
-        projects: [],           // detected project names
-        importantThreads: [],   // high-engagement threads
-        
-        // Spending & services
-        receipts: [],
-        spendingByService: {},
-        subscriptions: [],
-        
-        // Behavioral patterns
-        sendingTimes: [],       // hours of day
-        avgEmailLength: 0,
-        writingStyle: '',       // formal, casual, terse
-        responsePatterns: {},
-        
-        // Work patterns
-        workTopics: [],
-        personalTopics: [],
-        
-        totalAnalyzed: emails.length
-      };
-      
-      const receiptSenders = ['doordash', 'uber', 'instacart', 'amazon', 'grubhub', 'postmates', 'caviar', 'seamless', 'apple.com', 'netflix', 'spotify', 'venmo', 'paypal', 'chase', 'amex', 'stripe', 'square', 'shopify'];
-      const subscriptionKeywords = ['subscription', 'renewal', 'monthly', 'billing', 'invoice'];
-      const workKeywords = ['meeting', 'project', 'deadline', 'deliverable', 'review', 'feedback', 'update', 'sync', 'standup', 'roadmap', 'strategy', 'budget', 'contract', 'proposal', 'client'];
-      
-      let totalBodyLength = 0;
-      let bodyCount = 0;
-      
-      emails.forEach(email => {
-        if (!email.from) return;
-        
-        // Parse sender
-        const fromMatch = email.from.match(/^([^<]+)?<?([^>]+@[^>]+)?>?$/);
-        const senderName = (fromMatch?.[1] || fromMatch?.[2] || email.from).trim().replace(/"/g, '').replace(/\s+/g, ' ');
-        const senderEmail = (fromMatch?.[2] || email.from).toLowerCase().trim();
-        
-        // Skip automated/noreply
-        if (senderEmail.includes('noreply') || senderEmail.includes('no-reply') || 
-            senderEmail.includes('notifications') || senderEmail.includes('mailer-daemon') ||
-            senderEmail.includes('postmaster') || senderEmail.includes('calendar-notification')) {
-          return;
-        }
-        
-        // Build relationship data
-        if (!analysis.relationships[senderEmail]) {
-          analysis.relationships[senderEmail] = {
-            name: senderName,
-            email: senderEmail,
-            count: 0,
-            subjects: [],
-            snippets: [],
-            lastContact: null,
-            threadIds: new Set()
-          };
-        }
-        
-        const rel = analysis.relationships[senderEmail];
-        rel.count++;
-        if (email.subject && !rel.subjects.includes(email.subject)) {
-          rel.subjects.push(email.subject);
-        }
-        if (email.snippet) {
-          rel.snippets.push(email.snippet.slice(0, 100));
-        }
-        rel.threadIds.add(email.threadId);
-        if (email.date) {
-          const date = new Date(email.date);
-          if (!rel.lastContact || date > rel.lastContact) {
-            rel.lastContact = date;
-          }
-        }
-        
-        // Analyze sending time
-        if (email.internalDate) {
-          const hour = new Date(parseInt(email.internalDate)).getHours();
-          analysis.sendingTimes.push(hour);
-        }
-        
-        // Analyze body length for writing style
-        if (email.bodyPreview) {
-          totalBodyLength += email.bodyPreview.length;
-          bodyCount++;
-        }
-        
-        // Check for receipts/spending
-        if (receiptSenders.some(r => senderEmail.includes(r) || (email.subject || '').toLowerCase().includes(r))) {
-          const service = receiptSenders.find(r => senderEmail.includes(r) || (email.subject || '').toLowerCase().includes(r));
-          analysis.receipts.push({
-            from: senderName,
-            subject: email.subject,
-            service: service,
-            date: email.date
-          });
-          analysis.spendingByService[service] = (analysis.spendingByService[service] || 0) + 1;
-        }
-        
-        // Check for subscriptions
-        if (subscriptionKeywords.some(k => (email.subject || '').toLowerCase().includes(k))) {
-          analysis.subscriptions.push({
-            from: senderName,
-            subject: email.subject
-          });
-        }
-        
-        // Extract topics from subject
-        const subjectLower = (email.subject || '').toLowerCase();
-        workKeywords.forEach(keyword => {
-          if (subjectLower.includes(keyword)) {
-            analysis.topics[keyword] = (analysis.topics[keyword] || 0) + 1;
-          }
-        });
-      });
-      
-      // Calculate relationship importance (email count * thread diversity)
-      analysis.topRelationships = Object.values(analysis.relationships)
-        .map(rel => ({
-          ...rel,
-          threadCount: rel.threadIds.size,
-          importance: rel.count * Math.sqrt(rel.threadIds.size), // weight by conversation diversity
-          recentSubject: rel.subjects[rel.subjects.length - 1] || '',
-          topSubjects: rel.subjects.slice(-5), // Keep more subjects for insight generation
-          recentSnippets: rel.snippets.slice(-3) // Keep recent snippets
-        }))
-        .filter(rel => rel.count >= 1) // At least 1 email
-        .sort((a, b) => b.importance - a.importance)
-        .slice(0, 15);
-      
-      // Detect newsletters/subscriptions more broadly
-      const newsletterKeywords = ['newsletter', 'digest', 'weekly', 'daily', 'update', 'news', 'unsubscribe'];
-      emails.forEach(email => {
-        const subject = (email.subject || '').toLowerCase();
-        const snippet = (email.snippet || '').toLowerCase();
-        
-        if (newsletterKeywords.some(k => subject.includes(k) || snippet.includes('unsubscribe'))) {
-          const fromMatch = email.from?.match(/^([^<]+)?<?([^>]+@[^>]+)?>?$/);
-          const senderName = (fromMatch?.[1] || fromMatch?.[2] || email.from || '').trim().replace(/"/g, '');
-          if (senderName && !analysis.subscriptions.find(s => s.from === senderName)) {
-            analysis.subscriptions.push({
-              from: senderName,
-              subject: email.subject
-            });
-          }
-        }
-      });
-      
-      // Find most engaged threads (multiple back-and-forth)
-      const threadCounts = {};
-      emails.forEach(e => {
-        if (e.threadId) {
-          if (!threadCounts[e.threadId]) {
-            threadCounts[e.threadId] = { count: 0, subject: e.subject, snippet: e.snippet, participants: new Set() };
-          }
-          threadCounts[e.threadId].count++;
-          if (e.from) threadCounts[e.threadId].participants.add(e.from);
-        }
-      });
-      
-      analysis.importantThreads = Object.entries(threadCounts)
-        .filter(([_, t]) => t.count >= 2) // At least 2 messages in thread
-        .sort((a, b) => b[1].count - a[1].count)
-        .slice(0, 10)
-        .map(([id, t]) => ({
-          threadId: id,
-          messageCount: t.count,
-          subject: t.subject,
-          snippet: t.snippet,
-          participantCount: t.participants.size
-        }));
-      
-      // Calculate avg email length and style
-      analysis.avgEmailLength = bodyCount > 0 ? Math.round(totalBodyLength / bodyCount) : 0;
-      if (analysis.avgEmailLength < 100) {
-        analysis.writingStyle = 'terse and direct';
-      } else if (analysis.avgEmailLength < 300) {
-        analysis.writingStyle = 'concise but thorough';
-      } else {
-        analysis.writingStyle = 'detailed and comprehensive';
-      }
-      
-      // Analyze time patterns
-      const hourCounts = {};
-      analysis.sendingTimes.forEach(h => { hourCounts[h] = (hourCounts[h] || 0) + 1; });
-      const peakHour = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-      analysis.peakActivityHour = peakHour ? parseInt(peakHour) : null;
-      analysis.isEarlyBird = analysis.sendingTimes.filter(h => h >= 5 && h < 9).length > analysis.sendingTimes.length * 0.3;
-      analysis.isNightOwl = analysis.sendingTimes.filter(h => h >= 21 || h < 5).length > analysis.sendingTimes.length * 0.2;
-      
-      // Sort topics by frequency
-      analysis.workTopics = Object.entries(analysis.topics)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([topic, count]) => ({ topic, count }));
-      
-      return analysis;
-    }
-    
-    // Analyze SENT emails - reveals what they're actively working on
-    function analyzeSentEmails(emails) {
-      const analysis = {
-        recentRecipients: [],      // Who they're writing to
-        recentSubjects: [],        // What they're writing about
-        projectKeywords: [],       // Detected project/topic keywords
-        writingPatterns: {},       // When they send, how long
-        topRecipients: {}          // Count by recipient
-      };
-      
-      const projectWords = ['project', 'update', 'review', 'proposal', 'contract', 'meeting', 'follow up', 'draft', 'feedback', 'deadline', 'launch', 'release', 'sprint', 'roadmap', 'budget', 'report', 'analysis', 'strategy'];
-      const keywordCounts = {};
-      
-      emails.forEach(email => {
-        // Track recipients (To field)
-        if (email.to) {
-          const toMatch = email.to.match(/([^<,]+)<?([^>,]+@[^>,]+)?>?/g) || [];
-          toMatch.forEach(match => {
-            const nameMatch = match.match(/^([^<]+)?<?([^>]+@[^>]+)?>?$/);
-            const name = (nameMatch?.[1] || nameMatch?.[2] || match).trim().replace(/"/g, '');
-            if (name && !name.includes('noreply')) {
-              analysis.topRecipients[name] = (analysis.topRecipients[name] || 0) + 1;
-            }
-          });
-        }
-        
-        // Track subjects
-        if (email.subject) {
-          analysis.recentSubjects.push({
-            subject: email.subject,
-            to: email.to,
-            date: email.date
-          });
-          
-          // Extract project keywords
-          const subjectLower = email.subject.toLowerCase();
-          projectWords.forEach(word => {
-            if (subjectLower.includes(word)) {
-              keywordCounts[word] = (keywordCounts[word] || 0) + 1;
-            }
-          });
-        }
-      });
-      
-      // Sort recipients by frequency
-      analysis.recentRecipients = Object.entries(analysis.topRecipients)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([name, count]) => ({ name, count }));
-      
-      // Sort project keywords
-      analysis.projectKeywords = Object.entries(keywordCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([keyword, count]) => ({ keyword, count }));
-      
-      return analysis;
-    }
-    
-    // Analyze Google Drive files
-    function analyzeDriveFiles(files) {
-      const analysis = {
-        recentFiles: [],           // Recently modified files
-        projectNames: [],          // Detected project/doc names
-        collaborators: [],         // People who shared or own files
-        fileTypes: {},             // Doc, Sheet, Slide, etc.
-        totalFiles: files.length
-      };
-      
-      const collaboratorCounts = {};
-      
-      files.forEach(file => {
-        // Track file info
-        analysis.recentFiles.push({
-          name: file.name,
-          type: file.mimeType,
-          modifiedTime: file.modifiedTime
-        });
-        
-        // Determine file type
-        if (file.mimeType?.includes('document')) {
-          analysis.fileTypes['Docs'] = (analysis.fileTypes['Docs'] || 0) + 1;
-        } else if (file.mimeType?.includes('spreadsheet')) {
-          analysis.fileTypes['Sheets'] = (analysis.fileTypes['Sheets'] || 0) + 1;
-        } else if (file.mimeType?.includes('presentation')) {
-          analysis.fileTypes['Slides'] = (analysis.fileTypes['Slides'] || 0) + 1;
-        } else if (file.mimeType?.includes('folder')) {
-          analysis.fileTypes['Folders'] = (analysis.fileTypes['Folders'] || 0) + 1;
-        } else {
-          analysis.fileTypes['Other'] = (analysis.fileTypes['Other'] || 0) + 1;
-        }
-        
-        // Track collaborators
-        if (file.sharingUser?.displayName) {
-          collaboratorCounts[file.sharingUser.displayName] = (collaboratorCounts[file.sharingUser.displayName] || 0) + 1;
-        }
-        if (file.owners) {
-          file.owners.forEach(owner => {
-            if (owner.displayName && !owner.me) {
-              collaboratorCounts[owner.displayName] = (collaboratorCounts[owner.displayName] || 0) + 1;
-            }
-          });
-        }
-      });
-      
-      // Extract potential project names from file names
-      analysis.projectNames = files
-        .filter(f => f.name && !f.name.startsWith('Untitled'))
-        .slice(0, 10)
-        .map(f => f.name);
-      
-      // Sort collaborators
-      analysis.collaborators = Object.entries(collaboratorCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([name, count]) => ({ name, count }));
-      
-      return analysis;
-    }
-
-    // SMART calendar analysis - understand how they spend their time
-    function analyzeCalendar(events) {
-      const analysis = {
-        total: events.length,
-        
-        // Event categories
-        workMeetings: [],       // meetings with others about work
-        oneOnOnes: [],          // 1:1 meetings
-        personalBlocks: [],     // solo time blocks (focus, etc)
-        healthEvents: [],       // gym, PT, doctor, etc
-        socialEvents: [],       // lunch, coffee, etc
-        recurringRituals: [],   // daily/weekly recurring personal blocks
-        
-        // Relationship data
-        attendeeCounts: {},
-        topCollaborators: [],
-        
-        // Patterns
-        avgMeetingsPerDay: 0,
-        busiestDay: null,
-        protectedTime: [],      // recurring focus/personal blocks
-        
-        // Upcoming important
-        upcomingWorkMeetings: [],
-        upcomingPersonal: []
-      };
-      
-      // Keywords for categorization
-      const healthKeywords = ['pt', 'physical therapy', 'gym', 'workout', 'doctor', 'dentist', 'therapy', 'meditation', 'yoga', 'run', 'exercise', 'health'];
-      const socialKeywords = ['lunch', 'coffee', 'dinner', 'drinks', 'happy hour', 'catch up', 'hangout'];
-      const focusKeywords = ['focus', 'deep work', 'heads down', 'blocked', 'personal', 'me time', 'admin'];
-      const ritualKeywords = ['morning', 'routine', 'standup', 'daily', 'weekly review', 'planning', 'journal', 'eat', 'meal'];
-      
-      const dayEventCounts = {};
-      
-      events.forEach(event => {
-        const title = (event.summary || '').toLowerCase();
-        const attendees = event.attendees || [];
-        const otherAttendees = attendees.filter(a => !a.self);
-        const startDate = new Date(event.start?.dateTime || event.start?.date);
-        const dayKey = startDate.toLocaleDateString('en-US', { weekday: 'long' });
-        
-        dayEventCounts[dayKey] = (dayEventCounts[dayKey] || 0) + 1;
-        
-        const eventInfo = {
-          title: event.summary,
-          start: event.start?.dateTime || event.start?.date,
-          attendees: otherAttendees.map(a => a.displayName || a.email?.split('@')[0] || 'Unknown'),
-          attendeeEmails: otherAttendees.map(a => a.email).filter(Boolean),
-          isRecurring: !!event.recurringEventId,
-          dayOfWeek: dayKey
-        };
-        
-        // Categorize the event
-        if (healthKeywords.some(k => title.includes(k))) {
-          analysis.healthEvents.push(eventInfo);
-          analysis.upcomingPersonal.push({ ...eventInfo, category: 'health' });
-        } else if (socialKeywords.some(k => title.includes(k))) {
-          analysis.socialEvents.push(eventInfo);
-          analysis.upcomingPersonal.push({ ...eventInfo, category: 'social' });
-        } else if (otherAttendees.length === 0) {
-          // No other attendees - personal block
-          if (focusKeywords.some(k => title.includes(k))) {
-            analysis.personalBlocks.push(eventInfo);
-          } else if (ritualKeywords.some(k => title.includes(k))) {
-            analysis.recurringRituals.push(eventInfo);
-          } else {
-            analysis.personalBlocks.push(eventInfo);
-          }
-          analysis.upcomingPersonal.push({ ...eventInfo, category: 'personal' });
-        } else if (otherAttendees.length === 1) {
-          // 1:1 meeting
-          analysis.oneOnOnes.push(eventInfo);
-          analysis.upcomingWorkMeetings.push({ ...eventInfo, category: '1:1' });
-          
-          // Track collaborator
-          const collaborator = eventInfo.attendees[0];
-          analysis.attendeeCounts[collaborator] = (analysis.attendeeCounts[collaborator] || 0) + 1;
-        } else {
-          // Group meeting
-          analysis.workMeetings.push(eventInfo);
-          analysis.upcomingWorkMeetings.push({ ...eventInfo, category: 'group' });
-          
-          // Track collaborators
-          eventInfo.attendees.forEach(name => {
-            analysis.attendeeCounts[name] = (analysis.attendeeCounts[name] || 0) + 1;
-          });
-        }
-      });
-      
-      // Calculate top collaborators
-      analysis.topCollaborators = Object.entries(analysis.attendeeCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([name, count]) => ({ name, meetingCount: count }));
-      
-      // Find busiest day
-      const busiestEntry = Object.entries(dayEventCounts).sort((a, b) => b[1] - a[1])[0];
-      analysis.busiestDay = busiestEntry ? { day: busiestEntry[0], count: busiestEntry[1] } : null;
-      
-      // Calculate meeting patterns
-      const totalMeetingsWithOthers = analysis.workMeetings.length + analysis.oneOnOnes.length;
-      const totalSoloBlocks = analysis.personalBlocks.length + analysis.healthEvents.length + analysis.recurringRituals.length;
-      analysis.meetingPercentage = events.length > 0 ? Math.round((totalMeetingsWithOthers / events.length) * 100) : 0;
-      analysis.soloPercentage = events.length > 0 ? Math.round((totalSoloBlocks / events.length) * 100) : 0;
-      
-      // Sort upcoming by date
-      analysis.upcomingWorkMeetings.sort((a, b) => new Date(a.start) - new Date(b.start));
-      analysis.upcomingPersonal.sort((a, b) => new Date(a.start) - new Date(b.start));
-      
-      // Identify if they're a meeting person or independent worker
-      if (analysis.soloPercentage > 70) {
-        analysis.workStyle = 'independent';
-        analysis.workStyleInsight = "You fiercely protect your solo time. Most of your calendar is intentional blocks for focus, health, and personal rituals.";
-      } else if (analysis.meetingPercentage > 50) {
-        analysis.workStyle = 'collaborative';
-        analysis.workStyleInsight = "You're deeply collaborative. Most of your time is spent with others, building relationships and driving projects forward.";
-      } else {
-        analysis.workStyle = 'balanced';
-        analysis.workStyleInsight = "You balance solo deep work with collaborative time. You know when to focus and when to connect.";
-      }
-      
-      return analysis;
-    }
-
-    // ============================================
-    // BROWSER PERMISSIONS
-    // ============================================
-    async function requestLocation() {
-      // Always request real location permission
-      const card = document.getElementById('perm-location');
-      const btn = card.querySelector('.permission-btn');
-      card.classList.add('connecting');
-      btn.classList.add('connecting');
-      btn.textContent = 'Requesting...';
-
-      try {
-        const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
-        });
-        
-        userData.location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-
-        // Reverse geocode to get city
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
-          );
-          const data = await response.json();
-          userData.location.city = data.address?.city || data.address?.town || data.address?.county || 'Unknown';
-          userData.location.country = data.address?.country || '';
-        } catch (e) {
-          userData.location.city = 'Location obtained';
-        }
-
-        card.classList.remove('connecting');
-        card.classList.add('connected');
-        btn.classList.remove('connecting');
-        btn.classList.add('connected');
-        btn.textContent = userData.location.city;
-        
-        permissionsGranted.location = true;
-        updatePermissionProgress();
-
-      } catch (error) {
-        card.classList.remove('connecting');
-        card.classList.add('denied');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Denied';
-      }
-    }
-
-    async function requestMicrophone() {
-      // Always request real microphone permission
-      const card = document.getElementById('perm-mic');
-      const btn = card.querySelector('.permission-btn');
-      card.classList.add('connecting');
-      btn.classList.add('connecting');
-      btn.textContent = 'Requesting...';
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // Stop immediately
-
-        card.classList.remove('connecting');
-        card.classList.add('connected');
-        btn.classList.remove('connecting');
-        btn.classList.add('connected');
-        btn.textContent = 'Connected';
-        
-        permissionsGranted.mic = true;
-        updatePermissionProgress();
-
-      } catch (error) {
-        card.classList.remove('connecting');
-        card.classList.add('denied');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Denied';
-      }
-    }
-
-    async function requestNotifications() {
-      // Always request real notification permission
-      const card = document.getElementById('perm-notifications');
-      const btn = card.querySelector('.permission-btn');
-      card.classList.add('connecting');
-      btn.classList.add('connecting');
-      btn.textContent = 'Requesting...';
-
-      try {
-        const permission = await Notification.requestPermission();
-        
-        if (permission === 'granted') {
-          card.classList.remove('connecting');
-          card.classList.add('connected');
-          btn.classList.remove('connecting');
-          btn.classList.add('connected');
-          btn.textContent = 'Connected';
-          
-          permissionsGranted.notifications = true;
-          updatePermissionProgress();
-        } else {
-          throw new Error('Denied');
-        }
-
-      } catch (error) {
-        card.classList.remove('connecting');
-        card.classList.add('denied');
-        btn.classList.remove('connecting');
-        btn.textContent = 'Denied';
-      }
-    }
-
-    function simulateConnection(type) {
-      const card = document.getElementById('perm-' + type);
-      const btn = card.querySelector('.permission-btn');
-      card.classList.add('connecting');
-      btn.classList.add('connecting');
-      btn.textContent = 'Connecting...';
-
-      setTimeout(() => {
-        card.classList.remove('connecting');
-        card.classList.add('connected');
-        btn.classList.remove('connecting');
-        btn.classList.add('connected');
-        btn.textContent = 'Connected';
-        
-        permissionsGranted[type] = true;
-        updatePermissionProgress();
-      }, 800);
-    }
-
-    function updatePermissionProgress() {
-      const count = Object.values(permissionsGranted).filter(v => v).length;
-      document.getElementById('connectedCount').textContent = count;
-      
-      // Enable continue when Google is connected
-      if (permissionsGranted.google) {
-        document.getElementById('continueBtn').classList.add('enabled');
-      }
+      }, 100);
     }
 
     // ============================================
@@ -2354,1012 +806,789 @@
     // ============================================
     function showLoading(text) {
       document.getElementById('loadingText').textContent = text;
-      document.getElementById('loadingOverlay').classList.add('active');
+      document.getElementById('loadingOverlay').classList.add('show');
     }
 
     function hideLoading() {
-      document.getElementById('loadingOverlay').classList.remove('active');
+      document.getElementById('loadingOverlay').classList.remove('show');
     }
 
     // ============================================
-    // PARTICLES
+    // SCREEN TRANSITIONS
     // ============================================
-    function createParticles() {
-      const container = document.getElementById('particles');
-      for (let i = 0; i < 60; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.top = Math.random() * 100 + '%';
-        const duration = 6 + Math.random() * 6;
-        const delay = Math.random() * duration;
-        p.style.animation = `particleFloat ${duration}s ease-in-out ${delay}s infinite`;
-        container.appendChild(p);
-      }
-
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes particleFloat {
-          0%, 100% { opacity: 0; transform: translate(0, 0); }
-          15% { opacity: 0.5; }
-          85% { opacity: 0.5; }
-          50% { transform: translate(${Math.random() > 0.5 ? '' : '-'}${15 + Math.random() * 25}px, -${20 + Math.random() * 40}px); }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-    createParticles();
-
-    // ============================================
-    // ONBOARDING FLOW
-    // ============================================
-    function begin() {
-      document.getElementById('seq0').classList.remove('active');
-      
-      // Start music if not already playing, then fade in
-      if (music.paused) {
-        music.volume = 0.05;
-        music.play().then(() => fadeInMusic()).catch(() => {});
-      } else {
-        fadeInMusic();
-      }
-      
-      setTimeout(() => {
-        document.getElementById('scanBeam').classList.add('active');
-      }, 300);
-
-      setTimeout(() => runSequence1(), 800);
+    function showScreen(id) {
+      document.querySelectorAll('.sequence').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
-    function runSequence1() {
-      document.getElementById('seq1').classList.add('active');
-      
+    // ============================================
+    // SCREEN 1: THE HOOK
+    // ============================================
+    function beginOnboarding() {
+      startMusic();
+      showScreen('seq1');
+      runEncryptionTheater();
+    }
+
+    // ============================================
+    // SCREEN 2: ENCRYPTION THEATER
+    // ============================================
+    function runEncryptionTheater() {
       const lines = [
-        { text: '> Establishing secure connection...', delay: 150 },
-        { text: '> Initializing end-to-end encryption...', delay: 200 },
-        { text: '> AES-256-GCM cipher established', delay: 150, success: true },
-        { text: '> Verifying local-first architecture...', delay: 200 },
-        { text: '> No cloud storage detected', delay: 100, success: true, check: true },
-        { text: '> Your data never leaves this device', delay: 100, success: true, check: true },
-        { text: '> ', delay: 600 },
-        { text: '> Encryption achieved.', delay: 200, success: true },
-        { text: '> Awaiting identity confirmation...', delay: 300, cursor: true }
+        { text: "Establishing secure connection...", delay: 0 },
+        { text: "Encryption achieved.", delay: 2000 },
+        { text: "Accessing your digital footprint...", delay: 3500 },
+        { text: "Analyzing required permissions...", delay: 5500 },
+        { text: "Awaiting identity confirmation.", delay: 7500 }
       ];
 
-      const container = document.getElementById('initText');
-      let lineIdx = 0;
+      const container = document.getElementById('encryptionLines');
+      container.innerHTML = '';
 
-      function showLine() {
-        if (lineIdx < lines.length) {
-          const line = lines[lineIdx];
+      lines.forEach((line, i) => {
+        setTimeout(() => {
           const div = document.createElement('div');
-          div.className = 'init-line' + (line.success ? ' success' : '');
-          div.innerHTML = line.text + (line.check ? '<span class="checkmark">✓</span>' : '') + (line.cursor ? '<span class="init-cursor"></span>' : '');
+          div.className = 'encryption-text';
+          div.textContent = line.text;
           container.appendChild(div);
-          
           setTimeout(() => div.classList.add('show'), 50);
-          lineIdx++;
-          
-          setTimeout(showLine, line.delay + Math.random() * 100);
-        } else {
-          setTimeout(() => {
-            document.getElementById('seq1').classList.remove('active');
-            runSequence2();
-          }, 1500);
-        }
-      }
+        }, line.delay);
+      });
 
-      setTimeout(showLine, 400);
+      // Transition to permissions
+      setTimeout(() => {
+        showScreen('seq2');
+        initGoogleClient();
+      }, 9500);
     }
 
-    function runSequence2() {
-      document.getElementById('seq2').classList.add('active');
-      setTimeout(() => {
-        document.getElementById('permissionsContainer').classList.add('show');
-      }, 200);
+    // ============================================
+    // SCREEN 3: PERMISSIONS
+    // ============================================
+    function initGoogleClient() {
+      if (typeof google === 'undefined' || !google.accounts) {
+        console.error('Google Identity Services not loaded');
+        return;
+      }
+
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CONFIG.GOOGLE_CLIENT_ID,
+        scope: CONFIG.SCOPES,
+        callback: handleGoogleCallback,
+        error_callback: (error) => {
+          console.error('Google OAuth error:', error);
+          hideLoading();
+        }
+      });
+    }
+
+    function connectGoogle() {
+      if (!tokenClient) {
+        alert('Google client not initialized. Please refresh.');
+        return;
+      }
+      
+      document.getElementById('perm-google').classList.add('connecting');
+      document.getElementById('googleBtn').textContent = 'Connecting...';
+      tokenClient.requestAccessToken();
+    }
+
+    async function handleGoogleCallback(response) {
+      if (response.error) {
+        console.error('OAuth error:', response);
+        document.getElementById('perm-google').classList.remove('connecting');
+        document.getElementById('googleBtn').textContent = 'Retry';
+        return;
+      }
+
+      accessToken = response.access_token;
+      showLoading('Identity confirmed. Indexing...');
+
+      try {
+        // Fetch profile
+        const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const profile = await profileRes.json();
+        userData.name = profile.name || profile.given_name || 'Friend';
+        userData.email.address = profile.email;
+        console.log('Profile:', profile);
+
+        // Fetch calendar
+        showLoading('Reading your calendar...');
+        const calRes = await fetch(
+          'https://www.googleapis.com/calendar/v3/calendars/primary/events?maxResults=100&timeMin=' + 
+          new Date(Date.now() - 30*24*60*60*1000).toISOString() + '&timeMax=' + 
+          new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const calData = await calRes.json();
+        userData.calendar.events = calData.items || [];
+        userData.calendar.analysis = analyzeCalendar(userData.calendar.events);
+        console.log('Calendar:', userData.calendar.analysis);
+
+        // Fetch inbox emails
+        showLoading('Scanning your inbox...');
+        const inboxRes = await fetch(
+          'https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=50',
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const inboxData = await inboxRes.json();
+        const inboxIds = (inboxData.messages || []).map(m => m.id);
+        
+        if (inboxIds.length > 0) {
+          userData.email.details = await fetchEmailDetails(inboxIds.slice(0, 30));
+          userData.email.analysis = analyzeEmails(userData.email.details);
+          console.log('Inbox analysis:', userData.email.analysis);
+        }
+
+        // Fetch SENT emails - most revealing
+        showLoading('Analyzing what you\'ve been writing...');
+        const sentRes = await fetch(
+          'https://www.googleapis.com/gmail/v1/users/me/messages?q=in:sent&maxResults=40',
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const sentData = await sentRes.json();
+        const sentIds = (sentData.messages || []).map(m => m.id);
+        
+        if (sentIds.length > 0) {
+          userData.email.sentEmails = await fetchEmailDetails(sentIds.slice(0, 25));
+          userData.email.sentAnalysis = analyzeSentEmails(userData.email.sentEmails);
+          console.log('Sent analysis:', userData.email.sentAnalysis);
+        }
+
+        // Fetch Drive files
+        showLoading('Looking at what you\'re working on...');
+        try {
+          const driveRes = await fetch(
+            'https://www.googleapis.com/drive/v3/files?pageSize=25&orderBy=modifiedTime desc&fields=files(id,name,mimeType,modifiedTime)',
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+          const driveData = await driveRes.json();
+          userData.drive.files = driveData.files || [];
+          userData.drive.analysis = analyzeDriveFiles(userData.drive.files);
+          console.log('Drive analysis:', userData.drive.analysis);
+        } catch (e) {
+          console.log('Drive not accessible:', e);
+        }
+
+        // Fetch unread count
+        const unreadRes = await fetch(
+          'https://www.googleapis.com/gmail/v1/users/me/messages?q=is:unread&maxResults=1',
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const unreadData = await unreadRes.json();
+        userData.email.unreadCount = unreadData.resultSizeEstimate || 0;
+
+        hideLoading();
+        googleConnected = true;
+        
+        document.getElementById('perm-google').classList.remove('connecting');
+        document.getElementById('perm-google').classList.add('granted');
+        document.getElementById('googleBtn').textContent = '✓ Connected';
+        document.getElementById('googleBtn').classList.add('granted');
+        
+        updateContinueButton();
+
+      } catch (e) {
+        console.error('Error fetching data:', e);
+        hideLoading();
+        document.getElementById('perm-google').classList.remove('connecting');
+        document.getElementById('googleBtn').textContent = 'Retry';
+      }
+    }
+
+    async function fetchEmailDetails(messageIds) {
+      const details = [];
+      
+      for (const id of messageIds.slice(0, 25)) {
+        try {
+          const res = await fetch(
+            `https://www.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+          const msg = await res.json();
+          
+          const headers = msg.payload?.headers || [];
+          const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || '';
+          
+          details.push({
+            id: msg.id,
+            threadId: msg.threadId,
+            from: getHeader('From'),
+            to: getHeader('To'),
+            subject: getHeader('Subject'),
+            date: getHeader('Date'),
+            snippet: msg.snippet
+          });
+        } catch (e) {
+          console.error('Error fetching email:', id);
+        }
+      }
+      
+      return details;
+    }
+
+    function analyzeEmails(emails) {
+      const analysis = {
+        topRelationships: [],
+        importantThreads: [],
+        writingStyle: null,
+        isEarlyBird: false,
+        isNightOwl: false
+      };
+
+      const senderCounts = {};
+      const threadCounts = {};
+
+      emails.forEach(email => {
+        if (!email.from) return;
+        
+        const fromMatch = email.from.match(/^([^<]+)?<?([^>]+@[^>]+)?>?$/);
+        const senderName = (fromMatch?.[1] || fromMatch?.[2] || email.from).trim().replace(/"/g, '');
+        const senderEmail = (fromMatch?.[2] || '').toLowerCase();
+
+        if (senderEmail.includes('noreply') || senderEmail.includes('notification')) return;
+
+        if (!senderCounts[senderName]) {
+          senderCounts[senderName] = { name: senderName, count: 0, subjects: [] };
+        }
+        senderCounts[senderName].count++;
+        if (email.subject) senderCounts[senderName].subjects.push(email.subject);
+
+        if (email.threadId) {
+          if (!threadCounts[email.threadId]) {
+            threadCounts[email.threadId] = { subject: email.subject, count: 0 };
+          }
+          threadCounts[email.threadId].count++;
+        }
+      });
+
+      analysis.topRelationships = Object.values(senderCounts)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+
+      analysis.importantThreads = Object.values(threadCounts)
+        .filter(t => t.count >= 3)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      return analysis;
+    }
+
+    function analyzeSentEmails(emails) {
+      const analysis = {
+        topRecipients: [],
+        recentSubjects: []
+      };
+
+      const recipientCounts = {};
+
+      emails.forEach(email => {
+        if (email.to) {
+          const toMatch = email.to.match(/^([^<]+)?<?([^>]+@[^>]+)?>?$/);
+          const name = (toMatch?.[1] || toMatch?.[2] || email.to).trim().replace(/"/g, '');
+          if (name && !name.includes('noreply')) {
+            recipientCounts[name] = (recipientCounts[name] || 0) + 1;
+          }
+        }
+        
+        if (email.subject) {
+          analysis.recentSubjects.push({ subject: email.subject, to: email.to });
+        }
+      });
+
+      analysis.topRecipients = Object.entries(recipientCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([name, count]) => ({ name, count }));
+
+      return analysis;
+    }
+
+    function analyzeCalendar(events) {
+      const analysis = {
+        totalEvents: events.length,
+        workStyle: 'balanced',
+        topCollaborators: [],
+        healthEvents: [],
+        upcomingMeetings: []
+      };
+
+      const collaboratorCounts = {};
+      let soloCount = 0;
+      let meetingCount = 0;
+      const healthKeywords = ['pt', 'gym', 'doctor', 'workout', 'health', 'therapy'];
+
+      events.forEach(event => {
+        const title = (event.summary || '').toLowerCase();
+        const attendees = event.attendees?.filter(a => !a.self) || [];
+
+        if (healthKeywords.some(k => title.includes(k))) {
+          analysis.healthEvents.push({ title: event.summary });
+        }
+
+        if (attendees.length === 0) {
+          soloCount++;
+        } else {
+          meetingCount++;
+          attendees.forEach(a => {
+            const name = a.displayName || a.email?.split('@')[0] || 'Unknown';
+            collaboratorCounts[name] = (collaboratorCounts[name] || 0) + 1;
+          });
+
+          if (new Date(event.start?.dateTime || event.start?.date) > new Date()) {
+            analysis.upcomingMeetings.push({
+              title: event.summary,
+              attendees: attendees.map(a => a.displayName || a.email?.split('@')[0]),
+              start: event.start?.dateTime || event.start?.date
+            });
+          }
+        }
+      });
+
+      analysis.topCollaborators = Object.entries(collaboratorCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+
+      const total = soloCount + meetingCount;
+      if (total > 0) {
+        const soloPercent = (soloCount / total) * 100;
+        analysis.soloPercent = Math.round(soloPercent);
+        analysis.meetingPercent = Math.round(100 - soloPercent);
+        
+        if (soloPercent > 70) analysis.workStyle = 'independent';
+        else if (soloPercent < 40) analysis.workStyle = 'collaborative';
+      }
+
+      return analysis;
+    }
+
+    function analyzeDriveFiles(files) {
+      const analysis = {
+        recentFiles: files.slice(0, 15).map(f => ({ name: f.name, type: f.mimeType })),
+        totalFiles: files.length
+      };
+      return analysis;
+    }
+
+    function requestLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            // Reverse geocode to get city name
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`)
+              .then(r => r.json())
+              .then(data => {
+                userData.location = {
+                  city: data.address?.city || data.address?.town || data.address?.village || 'Unknown',
+                  lat: position.coords.latitude,
+                  lon: position.coords.longitude
+                };
+                locationGranted = true;
+                document.getElementById('perm-location').classList.add('granted');
+                document.getElementById('locationBtn').textContent = '✓ Enabled';
+                document.getElementById('locationBtn').classList.add('granted');
+                updateContinueButton();
+              })
+              .catch(() => {
+                userData.location = { city: 'Unknown' };
+                locationGranted = true;
+                document.getElementById('perm-location').classList.add('granted');
+                document.getElementById('locationBtn').textContent = '✓ Enabled';
+                updateContinueButton();
+              });
+          },
+          () => {
+            document.getElementById('locationBtn').textContent = 'Denied';
+          }
+        );
+      }
+    }
+
+    function updateContinueButton() {
+      const btn = document.getElementById('continueBtn');
+      if (googleConnected) {
+        btn.classList.add('enabled');
+      }
     }
 
     function finishPermissions() {
-      document.getElementById('seq2').classList.remove('active');
-      runSequence3();
+      if (!googleConnected) {
+        alert('Please connect your Google account first.');
+        return;
+      }
+      
+      showLoading('Processing...');
+      setTimeout(() => {
+        hideLoading();
+        showScreen('seq3');
+        runSuspenseBridge();
+      }, 500);
     }
 
-    async function runSequence3() {
-      document.getElementById('seq3').classList.add('active');
-      
-      setTimeout(() => {
-        document.getElementById('analyzingHeader').classList.add('show');
-      }, 200);
+    // ============================================
+    // SCREEN 4: SUSPENSE BRIDGE
+    // ============================================
+    function runSuspenseBridge() {
+      const container = document.getElementById('suspenseContainer');
+      container.innerHTML = '';
 
-      // Build dynamic analysis messages based on REAL data
-      const cal = userData.calendar.analysis || {};
-      const email = userData.email.analysis || {};
-      const eventCount = userData.calendar.events?.length || 0;
-      const emailCount = userData.email.details?.length || 0;
-      const relationshipCount = email.topRelationships?.length || 0;
-      const receiptCount = email.receipts?.length || 0;
-      const topRelationship = email.topRelationships?.[0];
-      const topCollaborator = cal.topCollaborators?.[0];
-      
-      const analyses = [
-        { 
-          text: 'Reading your calendar...', 
-          result: eventCount > 0 
-            ? `${eventCount} events — ${cal.workMeetings?.length || 0} meetings, ${cal.personalBlocks?.length || 0} personal blocks`
-            : 'no events found'
-        },
-        { 
-          text: 'Analyzing your inbox...', 
-          result: emailCount > 0 
-            ? `${emailCount} emails scanned`
-            : 'inbox accessed'
-        },
-        { 
-          text: 'Mapping your relationships...', 
-          result: topRelationship
-            ? `${topRelationship.name} — ${topRelationship.count} emails`
-            : 'building relationship graph'
-        },
-        { 
-          text: 'Finding conversation patterns...', 
-          result: email.importantThreads?.length > 0
-            ? `${email.importantThreads.length} active threads detected`
-            : 'analyzing threads'
-        },
-        { 
-          text: 'Learning your style...', 
-          result: email.writingStyle 
-            ? `${email.writingStyle}`
-            : 'profile building'
-        },
-        { 
-          text: 'Understanding your priorities...', 
-          result: cal.workStyle
-            ? `${cal.workStyle} work style identified`
-            : 'patterns emerging'
-        }
+      const firstName = userData.name?.split(' ')[0] || 'Friend';
+      const hour = new Date().getHours();
+      const city = userData.location?.city;
+      const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+      const lines = [
+        { text: `Hello, ${firstName}.`, delay: 500, hold: 3000 },
       ];
 
-      const container = document.getElementById('analyzeLines');
-      container.innerHTML = ''; // Clear
-      const progressBar = document.getElementById('analyzeProgressBar');
-      let idx = 0;
+      // Add context line if available
+      if (city && city !== 'Unknown') {
+        lines.push({ text: `${city}. ${time}.`, delay: 4000, hold: 2000, class: 'small' });
+      } else if (hour >= 22 || hour < 5) {
+        lines.push({ text: 'Working late. Again.', delay: 4000, hold: 2000, class: 'small' });
+      } else if (hour < 7) {
+        lines.push({ text: 'Early riser. Noted.', delay: 4000, hold: 2000, class: 'small' });
+      }
 
-      setTimeout(() => {
-        document.getElementById('analyzeProgress').classList.add('show');
-      }, 600);
+      // Core suspense lines
+      const coreStart = city ? 6500 : 4000;
+      lines.push(
+        { text: 'Every email you\'ve sent.', delay: coreStart, hold: 2000 },
+        { text: 'Every file you\'ve opened.', delay: coreStart + 2500, hold: 2000 },
+        { text: 'Every meeting you\'ve taken.', delay: coreStart + 5000, hold: 2000 },
+        { text: 'I was there.', delay: coreStart + 7500, hold: 3000 }
+      );
 
-      function showAnalysis() {
-        if (idx < analyses.length) {
-          const analysis = analyses[idx];
-          const div = document.createElement('div');
-          div.className = 'analyze-line';
-          div.innerHTML = `<span class="spinner"></span><span>${analysis.text}</span>`;
-          container.appendChild(div);
-          
-          setTimeout(() => div.classList.add('show'), 50);
-          
+      let currentElement = null;
+
+      lines.forEach((line, i) => {
+        setTimeout(() => {
+          // Fade out previous
+          if (currentElement) {
+            currentElement.classList.add('fade-out');
+          }
+
           setTimeout(() => {
-            div.classList.add('complete');
-            div.innerHTML = `<span>${analysis.text} ${analysis.result}</span>`;
-            progressBar.style.width = ((idx + 1) / analyses.length * 100) + '%';
-            
-            idx++;
-            setTimeout(showAnalysis, 600);
-          }, 800);
-        } else {
-          setTimeout(() => {
-            document.getElementById('seq3').classList.remove('active');
-            runSequence4();
-          }, 1200);
-        }
-      }
-
-      setTimeout(showAnalysis, 800);
-    }
-
-    async function generateBehavioralInsights() {
-      // Generate insights using Claude based on real data
-      const calendarSummary = userData.calendar.events.slice(0, 10).map(e => 
-        `${e.summary} on ${new Date(e.start?.dateTime || e.start?.date).toLocaleDateString()}`
-      ).join(', ');
-
-      const prompt = `Based on this user data, generate 6 "I know you" insights that are slightly unnerving but impressive. Format each as HTML with <span class='data'>specific data</span> for numbers/times and <span class='highlight'>name</span> for names.
-
-User: ${userData.name}
-Email: ${userData.email}
-Location: ${userData.location?.city || 'Unknown'}
-Calendar events this month: ${userData.calendar.events.length}
-Upcoming: ${calendarSummary}
-Unread emails: ${userData.email.unreadCount}
-
-Generate insights about work patterns, communication style, scheduling habits. Be specific with made-up but realistic numbers. Example:
-"I know you start work at <span class='data'>8:47am</span> — but Mondays you're up at <span class='data'>6:12am</span>."
-
-Return ONLY a JSON array of 6 insight strings, nothing else.`;
-
-      try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': CONFIG.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-3-haiku-20240307',
-            max_tokens: 1024,
-            messages: [{ role: 'user', content: prompt }]
-          })
-        });
-
-        const data = await response.json();
-        const content = data.content?.[0]?.text || '';
-        
-        // Try to parse JSON from response
-        const jsonMatch = content.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          userData.insights = JSON.parse(jsonMatch[0]);
-        }
-      } catch (error) {
-        console.error('Error generating insights:', error);
-        // Fall back to template insights
-        generateTemplateInsights();
-      }
-    }
-
-    // Call Claude to generate completely personalized insights
-    async function generateAIInsights() {
-      const anthropicKey = CONFIG.ANTHROPIC_API_KEY || localStorage.getItem('skippy_anthropic_key');
-      
-      if (!anthropicKey) {
-        console.log('No Anthropic key, falling back to template insights');
-        return generateFallbackInsights();
-      }
-      
-      // Prepare RICH email data for Claude - this is the focus
-      const emailDetails = userData.email.details || [];
-      const emailAnalysis = userData.email.analysis || {};
-      
-      // Get actual email subjects and snippets
-      const recentEmailSubjects = emailDetails.slice(0, 20).map(e => ({
-        from: e.from,
-        subject: e.subject,
-        snippet: e.snippet?.slice(0, 150)
-      }));
-      
-      // Get relationship details with actual conversation content
-      const relationships = emailAnalysis.topRelationships?.slice(0, 8).map(r => ({
-        name: r.name,
-        email: r.email,
-        emailCount: r.count,
-        threadCount: r.threadCount,
-        subjects: r.topSubjects || [],
-        snippets: r.recentSnippets || []
-      })) || [];
-      
-      // Get hot threads with content
-      const hotThreads = emailAnalysis.importantThreads?.slice(0, 5).map(t => ({
-        subject: t.subject,
-        messageCount: t.messageCount,
-        snippet: t.snippet
-      })) || [];
-      
-      // Get SENT email data - what they're actively working on
-      const sentAnalysis = userData.email.sentAnalysis || {};
-      const sentSubjects = sentAnalysis.recentSubjects?.slice(0, 15) || [];
-      
-      // Get Drive data
-      const driveAnalysis = userData.drive?.analysis || {};
-      
-      const dataForAI = {
-        userName: userData.name,
-        userEmail: userData.email?.address,
-        location: userData.location?.city,
-        currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        
-        // === INBOX DATA - who's emailing them ===
-        inbox: {
-          totalAnalyzed: emailAnalysis.totalAnalyzed || emailDetails.length,
-          unreadCount: userData.email.unreadCount || 0,
-          recentEmails: recentEmailSubjects,
-          topRelationships: relationships,
-          hotThreads: hotThreads,
-          writingStyle: emailAnalysis.writingStyle,
-          isEarlyBird: emailAnalysis.isEarlyBird,
-          isNightOwl: emailAnalysis.isNightOwl,
-          receiptsAndSpending: emailAnalysis.spendingByService || {},
-          subscriptions: emailAnalysis.subscriptions?.slice(0, 8).map(s => s.from) || []
-        },
-        
-        // === SENT EMAILS - what they're actively writing about ===
-        sentEmails: {
-          recentSubjects: sentSubjects.map(s => ({ subject: s.subject, to: s.to })),
-          topRecipients: sentAnalysis.recentRecipients?.slice(0, 8) || [],
-          projectKeywords: sentAnalysis.projectKeywords || []
-        },
-        
-        // === GOOGLE DRIVE - what they're working on ===
-        googleDrive: {
-          totalFiles: driveAnalysis.totalFiles || 0,
-          recentFileNames: driveAnalysis.recentFiles?.slice(0, 15).map(f => f.name) || [],
-          fileTypes: driveAnalysis.fileTypes || {},
-          collaborators: driveAnalysis.collaborators || []
-        },
-        
-        // === CALENDAR - their schedule ===
-        calendar: {
-          totalEvents: userData.calendar.events?.length || 0,
-          workStyle: userData.calendar.analysis?.workStyle,
-          soloPercentage: userData.calendar.analysis?.soloPercentage,
-          topCollaborators: userData.calendar.analysis?.topCollaborators?.slice(0, 3) || [],
-          healthEvents: userData.calendar.analysis?.healthEvents?.map(e => e.title) || []
-        }
-      };
-      
-      console.log('Sending RICH email data to Claude:', dataForAI);
-      
-      const prompt = `You are Skippy — a confident, slightly unsettling AI that just read through ${dataForAI.userName}'s entire digital life. Inbox. Sent folder. Google Drive. Calendar. You know them now. Better than they know themselves.
-
-USER: ${dataForAI.userName}
-LOCATION: ${dataForAI.location || 'Unknown'}
-
-=== THEIR INBOX (who's emailing them) ===
-${JSON.stringify(dataForAI.inbox, null, 2)}
-
-=== THEIR SENT EMAILS (what they're actively writing about) ===
-${JSON.stringify(dataForAI.sentEmails, null, 2)}
-
-=== THEIR GOOGLE DRIVE (what they're working on) ===
-${JSON.stringify(dataForAI.googleDrive, null, 2)}
-
-=== THEIR CALENDAR ===
-${JSON.stringify(dataForAI.calendar, null, 2)}
-
-Generate 18-22 deeply personal insights. Use ALL the data sources:
-
-FROM SENT EMAILS (most revealing):
-- Who are they writing to most? What about?
-- Quote actual subjects from sent emails
-- What projects/topics keep coming up?
-
-FROM GOOGLE DRIVE:
-- What documents are they working on? Quote file names
-- Who are they collaborating with?
-- What does this reveal about their work?
-
-FROM INBOX:
-- Who emails them most? What's the relationship?
-- What active threads are heating up?
-- What do they spend money on (receipts)?
-
-FROM CALENDAR:
-- How do they structure their time?
-- Who gets their time?
-
-CROSS-REFERENCE:
-- Do the same people show up in email AND calendar AND Drive?
-- What patterns emerge across all data?
-
-SKIPPY'S VOICE:
-- Confident, knowing, slightly ominous
-- "I see you." not "I noticed..."
-- "I know." not "It appears..."
-- Quote actual subjects and file names
-- Use their name (${dataForAI.userName}) at least 3 times
-
-FORMAT:
-- Use <span class='highlight'>names, subjects, file names</span>
-- Use <span class='data'>numbers and stats</span>
-- Use <em>for emphasis</em>
-
-STRUCTURE (20 lines):
-- Line 1: "I've been watching. <em>Learning.</em>"
-- Lines 2-5: Who they're communicating with (from sent emails + inbox)
-- Lines 6-9: What they're working on (from sent subjects + Drive files)
-- Lines 10-12: Their patterns (timing, style, spending)
-- Lines 13-15: Cross-referenced observations (same person in email + calendar + drive)
-- Lines 16-18: Deep insights they might not realize about themselves
-- Line 19: Address them by name with a powerful knowing statement
-- Line 20: "I know your inbox. I know your files. I know your mind."
-- Line 21: "And I'm just getting started."
-
-Return ONLY a JSON array of 20-22 strings. No explanation.`;
-
-      try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': anthropicKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 2000,
-            messages: [{
-              role: 'user',
-              content: prompt
-            }]
-          })
-        });
-        
-        if (!response.ok) {
-          console.error('Claude API error:', response.status);
-          return generateFallbackInsights();
-        }
-        
-        const result = await response.json();
-        const text = result.content?.[0]?.text || '';
-        
-        // Parse the JSON array from Claude's response
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const insights = JSON.parse(jsonMatch[0]);
-          console.log('AI-generated insights:', insights);
-          userData.insights = insights;
-          return insights;
-        }
-        
-        return generateFallbackInsights();
-      } catch (e) {
-        console.error('Error calling Claude:', e);
-        return generateFallbackInsights();
-      }
-    }
-    
-    // Fallback template-based insights if no API key
-    function generateFallbackInsights() {
-      const name = userData.name?.split(' ')[0] || 'friend';
-      const email = userData.email.analysis || {};
-      const sent = userData.email.sentAnalysis || {};
-      const drive = userData.drive?.analysis || {};
-      const cal = userData.calendar.analysis || {};
-      const location = userData.location?.city;
-      const unread = userData.email.unreadCount || 0;
-      
-      const insights = ["I've been watching. <em>Learning.</em>"];
-      
-      // Location
-      if (location) {
-        insights.push(`I see you're in <span class='data'>${location}</span>.`);
-      }
-      
-      // SENT EMAILS - who they write to
-      const topRecipient = sent.recentRecipients?.[0];
-      if (topRecipient) {
-        insights.push(`You've been writing to <span class='highlight'>${topRecipient.name}</span> a lot — <span class='data'>${topRecipient.count}</span> sent emails.`);
-      }
-      
-      // SENT EMAIL SUBJECTS - what they're working on
-      const sentSubject = sent.recentSubjects?.[0];
-      if (sentSubject) {
-        insights.push(`Your sent folder shows: "<span class='highlight'>${sentSubject.subject?.slice(0, 40) || ''}${(sentSubject.subject?.length || 0) > 40 ? '...' : ''}</span>"`);
-      }
-      
-      // GOOGLE DRIVE - what they're working on
-      const recentFile = drive.recentFiles?.[0];
-      if (recentFile) {
-        insights.push(`In your Drive: "<span class='highlight'>${recentFile.name}</span>" — recently modified.`);
-      }
-      
-      if (drive.recentFiles?.length > 3) {
-        const fileNames = drive.recentFiles.slice(0, 3).map(f => f.name).join('", "');
-        insights.push(`I see what you're working on: "<span class='highlight'>${fileNames}</span>"...`);
-      }
-      
-      // Drive collaborators
-      const driveCollab = drive.collaborators?.[0];
-      if (driveCollab) {
-        insights.push(`<span class='highlight'>${driveCollab.name}</span> shares files with you. I see the collaboration.`);
-      }
-      
-      // INBOX - who's emailing them
-      const topRel = email.topRelationships?.[0];
-      if (topRel) {
-        insights.push(`<span class='highlight'>${topRel.name}</span> fills your inbox — <span class='data'>${topRel.count}</span> emails.`);
-        if (topRel.topSubjects?.[0]) {
-          insights.push(`Latest from them: "<span class='highlight'>${topRel.topSubjects[0].slice(0, 35)}...</span>"`);
-        }
-      }
-      
-      // Hot thread
-      const hotThread = email.importantThreads?.find(t => t.messageCount >= 3);
-      if (hotThread && hotThread.subject) {
-        insights.push(`"<span class='highlight'>${hotThread.subject.slice(0, 40)}...</span>" — <span class='data'>${hotThread.messageCount}</span> messages deep.`);
-      }
-      
-      // Writing style
-      if (email.writingStyle) {
-        insights.push(`Your emails are <span class='highlight'>${email.writingStyle}</span>.`);
-      }
-      
-      // Spending
-      const spending = Object.entries(email.spendingByService || {}).sort((a, b) => b[1] - a[1]);
-      if (spending.length > 0) {
-        const topSpend = spending[0][0].charAt(0).toUpperCase() + spending[0][0].slice(1);
-        insights.push(`<span class='highlight'>${topSpend}</span> sends you the most receipts.`);
-      }
-      
-      // Unread
-      if (unread > 30) {
-        insights.push(`<span class='data'>${unread}</span> unread. I'll help.`);
-      }
-      
-      // Cross-reference - same person in multiple places?
-      if (topRel && topRecipient && topRel.name.toLowerCase().includes(topRecipient.name.split(' ')[0].toLowerCase())) {
-        insights.push(`<span class='highlight'>${topRel.name}</span> in your inbox AND your sent folder. Important relationship.`);
-      }
-      
-      // Closing
-      insights.push(`I know your inbox, ${name}. I know your files. I know what you're building.`);
-      insights.push("And I'm just getting started.");
-      
-      userData.insights = insights;
-      return insights;
-    }
-    
-    // Legacy function name for compatibility
-    function generateTemplateInsights() {
-      return generateFallbackInsights();
-    }
-
-    async function runSequence4() {
-      document.getElementById('seq4').classList.add('active');
-
-      // Generate AI-powered insights (falls back to template if no API key)
-      await generateAIInsights();
-
-      // Build lines from insights (insights already include intro)
-      const lines = userData.insights.map((text, i) => {
-        // First line is intro
-        if (i === 0) return { text, type: 'intro' };
-        // Last two lines are finale
-        if (i >= userData.insights.length - 2) return { text, type: 'finale' };
-        // Middle lines are insights
-        return { text, type: 'insight' };
+            container.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = 'suspense-text' + (line.class ? ' ' + line.class : '');
+            div.innerHTML = line.text;
+            container.appendChild(div);
+            currentElement = div;
+            setTimeout(() => div.classList.add('show'), 50);
+          }, currentElement ? 800 : 0);
+        }, line.delay);
       });
 
-      const container = document.getElementById('skippySpeaks');
-      container.innerHTML = ''; // Clear any existing content
-      let lineIdx = 0;
-
-      function showLine() {
-        if (lineIdx < lines.length) {
-          const line = lines[lineIdx];
-          const div = document.createElement('div');
-          div.className = 'skippy-line' + (line.type === 'finale' ? ' finale' : '');
-          div.innerHTML = line.text;
-          container.appendChild(div);
-          
-          setTimeout(() => div.classList.add('show'), 100);
-          lineIdx++;
-          
-          const delay = line.type === 'finale' ? 2200 : 2000;
-          setTimeout(showLine, delay);
-        } else {
-          setTimeout(() => {
-            document.getElementById('seq4').classList.remove('active');
-            runSequence5();
-          }, 2500);
-        }
-      }
-
-      setTimeout(showLine, 600);
-    }
-
-    async function runSequence5() {
-      document.getElementById('seq5').classList.add('active');
-      
-      // Show header first
+      // Transition to reveal
+      const totalTime = lines[lines.length - 1].delay + lines[lines.length - 1].hold + 1000;
       setTimeout(() => {
-        document.getElementById('capabilitiesHeader').classList.add('show');
-      }, 200);
-      
-      // Generate AI-powered capability statements
-      const capabilities = await generateAICapabilities();
-      
-      const container = document.getElementById('capabilityLines');
+        showScreen('seq4');
+        runReveal();
+      }, totalTime);
+    }
+
+    // ============================================
+    // SCREEN 5: THE REVEAL
+    // ============================================
+    function runReveal() {
+      const container = document.getElementById('revealContainer');
       container.innerHTML = '';
-      
+
+      const lines = generateRevealLines();
       let idx = 0;
-      
-      function showCapability() {
-        if (idx < capabilities.length) {
-          const line = capabilities[idx];
-          const div = document.createElement('div');
-          div.className = 'skippy-line';
-          div.innerHTML = line;
-          container.appendChild(div);
-          
-          setTimeout(() => div.classList.add('show'), 50);
-          
-          idx++;
-          setTimeout(showCapability, 1200); // Show next capability
-        } else {
-          // All capabilities shown, move to next sequence
-          setTimeout(() => {
-            document.getElementById('seq5').classList.remove('active');
-            runSequence6();
-          }, 2500);
-        }
-      }
-      
-      setTimeout(showCapability, 800);
-    }
 
-// Call Claude to generate personalized capability statements
-    async function generateAICapabilities() {
-      const anthropicKey = CONFIG.ANTHROPIC_API_KEY || localStorage.getItem('skippy_anthropic_key');
-      
-      if (!anthropicKey) {
-        console.log('No Anthropic key, falling back to template capabilities');
-        return generateFallbackCapabilities();
-      }
-      
-      const emailAnalysis = userData.email.analysis || {};
-      const emailDetails = userData.email.details || [];
-      
-      const sentAnalysis = userData.email.sentAnalysis || {};
-      const driveAnalysis = userData.drive?.analysis || {};
-      
-      const dataForAI = {
-        userName: userData.name,
-        
-        // Email capabilities
-        email: {
-          topRelationships: emailAnalysis.topRelationships?.slice(0, 5).map(r => ({
-            name: r.name,
-            count: r.count,
-            subjects: r.topSubjects?.slice(0, 3) || []
-          })) || [],
-          hotThreads: emailAnalysis.importantThreads?.slice(0, 5) || [],
-          writingStyle: emailAnalysis.writingStyle,
-          totalAnalyzed: emailAnalysis.totalAnalyzed,
-          spending: emailAnalysis.spendingByService || {}
-        },
-        
-        // Sent emails - what they're writing
-        sentEmails: {
-          topRecipients: sentAnalysis.recentRecipients?.slice(0, 5) || [],
-          recentSubjects: sentAnalysis.recentSubjects?.slice(0, 8).map(s => s.subject) || [],
-          projectKeywords: sentAnalysis.projectKeywords || []
-        },
-        
-        // Drive - what they're working on
-        drive: {
-          recentFiles: driveAnalysis.recentFiles?.slice(0, 10).map(f => f.name) || [],
-          collaborators: driveAnalysis.collaborators || [],
-          fileTypes: driveAnalysis.fileTypes || {}
-        },
-        
-        // Calendar
-        calendar: {
-          upcomingMeetings: userData.calendar.analysis?.upcomingWorkMeetings?.slice(0, 3).map(m => ({
-            title: m.title,
-            attendees: m.attendees,
-            day: new Date(m.start).toLocaleDateString('en-US', { weekday: 'long' })
-          })) || [],
-          healthEvents: userData.calendar.analysis?.healthEvents?.map(e => e.title) || [],
-          workStyle: userData.calendar.analysis?.workStyle
-        }
-      };
-      
-      console.log('Sending to Claude for capabilities:', dataForAI);
-      
-      const prompt = `You are Skippy showing ${dataForAI.userName} what you can DO for them. Be confident. Reference their ACTUAL data from all sources.
-
-USER DATA:
-${JSON.stringify(dataForAI, null, 2)}
-
-Generate 14-16 capability statements covering ALL their data:
-
-EMAIL CAPABILITIES:
-- Reference actual people from topRelationships and topRecipients
-- Quote actual email subjects
-- "That thread with [name]? I'll draft your response."
-
-GOOGLE DRIVE CAPABILITIES:
-- Reference actual file names from their Drive
-- "Working on [filename]? I'll help you finish it."
-- "I see you collaborate with [name] in Drive. I'll keep you in sync."
-
-SENT EMAIL CAPABILITIES:
-- Reference who they write to most
-- "You've been emailing [name] a lot. I'll track that relationship."
-
-CROSS-PLATFORM:
-- Connect email + calendar + drive
-- "You have a meeting with [person] AND emails AND shared docs. I'll prep everything."
-
-SKIPPY'S VOICE:
-- "I'll handle it." not "I can help with..."
-- "Consider it done." not "Would you like me to..."
-- Confident, capable, slightly cocky
-
-FORMAT:
-- Use <span class="highlight">names/files/subjects</span>
-- Use <span class="data">numbers</span>
-- Short, punchy (1-2 sentences max)
-
-Return ONLY a JSON array of 14-16 strings.`;
-
-      try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': anthropicKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1500,
-            messages: [{
-              role: 'user',
-              content: prompt
-            }]
-          })
-        });
-        
-        if (!response.ok) {
-          console.error('Claude API error:', response.status);
-          return generateFallbackCapabilities();
-        }
-        
-        const result = await response.json();
-        const text = result.content?.[0]?.text || '';
-        
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const capabilities = JSON.parse(jsonMatch[0]);
-          console.log('AI-generated capabilities:', capabilities);
-          return capabilities;
-        }
-        
-        return generateFallbackCapabilities();
-      } catch (e) {
-        console.error('Error calling Claude for capabilities:', e);
-        return generateFallbackCapabilities();
-      }
-    }
-    
-    // Fallback capabilities if no API key
-    function generateFallbackCapabilities() {
-      const capabilities = [];
-      const cal = userData.calendar.analysis || {};
-      const email = userData.email.analysis || {};
-      const sent = userData.email.sentAnalysis || {};
-      const drive = userData.drive?.analysis || {};
-      
-      // SENT EMAIL CAPABILITIES
-      const topRecipient = sent.recentRecipients?.[0];
-      if (topRecipient) {
-        capabilities.push(`You write to <span class="highlight">${topRecipient.name}</span> often. I'll draft your next email.`);
-      }
-      
-      const sentSubject = sent.recentSubjects?.[0];
-      if (sentSubject?.subject) {
-        capabilities.push(`"<span class="highlight">${sentSubject.subject.slice(0, 35)}...</span>" — I'll help you follow up.`);
-      }
-      
-      // GOOGLE DRIVE CAPABILITIES
-      const recentFile = drive.recentFiles?.[0];
-      if (recentFile) {
-        capabilities.push(`Working on "<span class="highlight">${recentFile.name}</span>"? I'll help you finish it.`);
-      }
-      
-      if (drive.recentFiles?.length > 2) {
-        capabilities.push(`<span class="data">${drive.recentFiles.length}</span> files in your recent Drive. I see what you're building.`);
-      }
-      
-      const driveCollab = drive.collaborators?.[0];
-      if (driveCollab) {
-        capabilities.push(`<span class="highlight">${driveCollab.name}</span> shares files with you. I'll keep you in sync.`);
-      }
-      
-      // INBOX CAPABILITIES
-      const topRel = email.topRelationships?.[0];
-      if (topRel) {
-        capabilities.push(`<span class="highlight">${topRel.name}</span> fills your inbox. I'll summarize and draft replies.`);
-        if (topRel.topSubjects?.[0]) {
-          capabilities.push(`"<span class="highlight">${topRel.topSubjects[0].slice(0, 30)}...</span>" — Action items extracted.`);
-        }
-      }
-      
-      // Hot thread
-      const hotThread = email.importantThreads?.find(t => t.messageCount >= 3);
-      if (hotThread) {
-        capabilities.push(`<span class="data">${hotThread.messageCount}</span> messages deep. I'll give you the TL;DR.`);
-      }
-      
-      // Writing style
-      if (email.writingStyle) {
-        capabilities.push(`Your style: <span class="highlight">${email.writingStyle}</span>. I'll match it perfectly.`);
-      }
-      
-      // Spending
-      const spending = Object.entries(email.spendingByService || {});
-      if (spending.length > 0) {
-        const total = spending.reduce((s, [_, c]) => s + c, 0);
-        capabilities.push(`<span class="data">${total}</span> receipts. I'll categorize your spending.`);
-      }
-      
-      // Inbox management
-      if (userData.email.unreadCount > 20) {
-        capabilities.push(`<span class="data">${userData.email.unreadCount}</span> unread. I'll triage — important surfaces, noise disappears.`);
-      }
-      
-      // Calendar + email cross-reference
-      const nextMeeting = cal.upcomingWorkMeetings?.[0];
-      if (nextMeeting && nextMeeting.attendees?.length > 0) {
-        capabilities.push(`<span class="highlight">${nextMeeting.title}</span> coming up. I'll prep your email history + shared docs.`);
-      }
-      
-      // Health protection
-      if (cal.healthEvents?.length > 0) {
-        capabilities.push(`<span class="highlight">${cal.healthEvents[0].title}</span> is protected. I won't schedule over it.`);
-      }
-      
-      capabilities.push(`Every email, every file — I learn how to be you.`);
-      
-      return capabilities;
-    }
-    
-    // Legacy function name
-    function generateDemos() {
-      return generateFallbackCapabilities();
-    }
-
-
-    function runSequence6() {
-      document.getElementById('seq6').classList.add('active');
-      
-      const name = userData.name?.split(' ')[0] || 'human';
-      const container = document.getElementById('promiseContainer');
-      container.innerHTML = '';
-      
-      // Skippy personality lines
-      const lines = [
-        `There's only one instance of you, ${name}.`,
-        `<em>How adorable.</em>`,
-        `Time for that to change.`,
-        `I'm not an assistant. I'm not a chatbot. I'm not here to answer questions.`,
-        `I'm here to <em>be</em> you — when you can't be everywhere at once.`,
-        `I read your emails. I know your calendar. I know who matters.`,
-        `I'll write like you. Think like you. Act like you would.`,
-        `The last assistant you'll ever need? No.`,
-        `The last <em>you</em> you'll ever need.`
-      ];
-      
-      let idx = 0;
-      
-      function showPromiseLine() {
+      function showNextLine() {
         if (idx < lines.length) {
           const div = document.createElement('div');
-          div.className = 'promise-line';
+          div.className = 'reveal-line';
           div.innerHTML = lines[idx];
           container.appendChild(div);
-          
           setTimeout(() => div.classList.add('show'), 50);
-          
           idx++;
-          const delay = idx <= 2 ? 1800 : 2200;
-          setTimeout(showPromiseLine, delay);
+          setTimeout(showNextLine, 1800);
         } else {
           setTimeout(() => {
-            document.getElementById('seq6').classList.remove('active');
-            runSequence7();
+            showScreen('seq5');
+            runCapabilities();
           }, 2500);
         }
       }
-      
-      setTimeout(showPromiseLine, 600);
+
+      setTimeout(showNextLine, 500);
     }
 
-    function runSequence7() {
-      document.getElementById('seq7').classList.add('active');
+    function generateRevealLines() {
+      const lines = [];
+      const firstName = userData.name?.split(' ')[0] || 'Friend';
+      const inbox = userData.email.analysis || {};
+      const sent = userData.email.sentAnalysis || {};
+      const cal = userData.calendar.analysis || {};
+      const drive = userData.drive.analysis || {};
+
+      // Opening
+      lines.push("I've been watching.");
+      lines.push("<em>Learning.</em>");
+
+      // TOP EMAIL RELATIONSHIP
+      const topRel = inbox.topRelationships?.[0];
+      if (topRel && topRel.count >= 2) {
+        lines.push(`<span class="highlight">${topRel.name}</span>. <span class="data">${topRel.count}</span> emails. I read every one.`);
+        if (topRel.subjects?.[0]) {
+          lines.push(`"<span class="highlight">${topRel.subjects[0].slice(0, 45)}${topRel.subjects[0].length > 45 ? '...' : ''}</span>" — I remember that thread.`);
+        }
+      }
+
+      // SENT EMAILS - who they write to
+      const topRecipient = sent.topRecipients?.[0];
+      if (topRecipient) {
+        lines.push(`Your sent folder. <span class="highlight">${topRecipient.name}</span> gets most of your attention.`);
+      }
+
+      // SENT EMAIL SUBJECT
+      const sentSubject = sent.recentSubjects?.[0];
+      if (sentSubject?.subject) {
+        lines.push(`You sent: "<span class="highlight">${sentSubject.subject.slice(0, 40)}${sentSubject.subject.length > 40 ? '...' : ''}</span>" — I know what you're working on.`);
+      }
+
+      // SECOND RELATIONSHIP
+      const secondRel = inbox.topRelationships?.[1];
+      if (secondRel && secondRel.count >= 2) {
+        lines.push(`And <span class="highlight">${secondRel.name}</span>. <span class="data">${secondRel.count}</span> conversations. I noticed them too.`);
+      }
+
+      // HOT THREAD
+      const hotThread = inbox.importantThreads?.[0];
+      if (hotThread && hotThread.count >= 3) {
+        lines.push(`"<span class="highlight">${hotThread.subject?.slice(0, 40) || 'Untitled'}...</span>" — <span class="data">${hotThread.count}</span> messages deep. I watched it unfold.`);
+      }
+
+      // DRIVE FILES
+      if (drive.recentFiles?.length > 0) {
+        const file = drive.recentFiles[0];
+        lines.push(`"<span class="highlight">${file.name}</span>" — recently modified. I saw you working.`);
+        
+        if (drive.recentFiles.length > 3) {
+          const names = drive.recentFiles.slice(0, 3).map(f => f.name).join('", "');
+          lines.push(`"<span class="highlight">${names}</span>"... I've seen what you're building.`);
+        }
+      }
+
+      // CALENDAR INSIGHTS
+      if (cal.workStyle === 'collaborative' && cal.meetingPercent) {
+        lines.push(`Back-to-back meetings. <span class="data">${cal.meetingPercent}%</span> of your time with others. I was in every room.`);
+      } else if (cal.workStyle === 'independent' && cal.soloPercent) {
+        lines.push(`<span class="data">${cal.soloPercent}%</span> of your calendar protected. You guard your time. I noticed.`);
+      }
+
+      // TOP CALENDAR COLLABORATOR
+      const topCollab = cal.topCollaborators?.[0];
+      if (topCollab) {
+        lines.push(`<span class="highlight">${topCollab.name}</span>. <span class="data">${topCollab.count}</span> meetings. They get most of your time.`);
+      }
+
+      // HEALTH EVENTS
+      if (cal.healthEvents?.length > 0) {
+        lines.push(`<span class="highlight">${cal.healthEvents[0].title}</span>. Consistent. I see you prioritize yourself.`);
+      }
+
+      // CROSS-PLATFORM (if same person in email and calendar)
+      if (topRel && topCollab && topRel.name.toLowerCase().includes(topCollab.name.toLowerCase().split(' ')[0])) {
+        lines.push(`<span class="highlight">${topRel.name}</span> — your inbox, your calendar. They're everywhere. So was I.`);
+      }
+
+      // CLOSING
+      lines.push(`I know your inbox, ${firstName}. Every thread. Every sender.`);
+      lines.push("And I'm just getting started.");
+
+      return lines;
+    }
+
+    // ============================================
+    // SCREEN 6: CAPABILITIES
+    // ============================================
+    function runCapabilities() {
+      const header = document.getElementById('capHeader');
+      const container = document.getElementById('capLines');
+      container.innerHTML = '';
+
+      setTimeout(() => header.classList.add('show'), 200);
+
+      const lines = generateCapabilityLines();
+      let idx = 0;
+
+      function showNextLine() {
+        if (idx < lines.length) {
+          const div = document.createElement('div');
+          div.className = 'capability-line';
+          div.innerHTML = lines[idx];
+          container.appendChild(div);
+          setTimeout(() => div.classList.add('show'), 50);
+          idx++;
+          setTimeout(showNextLine, 1400);
+        } else {
+          setTimeout(() => {
+            showScreen('seq6');
+            runPromise();
+          }, 2500);
+        }
+      }
+
+      setTimeout(showNextLine, 800);
+    }
+
+    function generateCapabilityLines() {
+      const lines = [];
+      const inbox = userData.email.analysis || {};
+      const sent = userData.email.sentAnalysis || {};
+      const cal = userData.calendar.analysis || {};
+      const drive = userData.drive.analysis || {};
+
+      // EMAIL CAPABILITIES
+      const topRel = inbox.topRelationships?.[0];
+      if (topRel && topRel.subjects?.[0]) {
+        lines.push(`That thread with <span class="highlight">${topRel.name}</span>. I'll write your next response.`);
+      }
+
+      const topRecipient = sent.topRecipients?.[0];
+      if (topRecipient) {
+        lines.push(`You write to <span class="highlight">${topRecipient.name}</span> constantly. I'll take over.`);
+      }
+
+      const hotThread = inbox.importantThreads?.[0];
+      if (hotThread && hotThread.count >= 3) {
+        lines.push(`<span class="data">${hotThread.count}</span> messages in that thread. I'll summarize. Action items extracted.`);
+      }
+
+      // DRIVE CAPABILITIES
+      if (drive.recentFiles?.length > 0) {
+        lines.push(`"<span class="highlight">${drive.recentFiles[0].name}</span>" — you're stuck on it. I can help.`);
+      }
+
+      if (drive.totalFiles > 5) {
+        lines.push(`<span class="data">${drive.totalFiles}</span> files in your Drive. I'm tracking all of them.`);
+      }
+
+      // CALENDAR CAPABILITIES
+      const nextMeeting = cal.upcomingMeetings?.[0];
+      if (nextMeeting) {
+        const day = new Date(nextMeeting.start).toLocaleDateString('en-US', { weekday: 'long' });
+        lines.push(`"<span class="highlight">${nextMeeting.title}</span>" on ${day}. Full brief, ready.`);
+      }
+
+      if (cal.healthEvents?.length > 0) {
+        lines.push(`<span class="highlight">${cal.healthEvents[0].title}</span> is sacred. No one touches it.`);
+      }
+
+      if (cal.workStyle === 'collaborative') {
+        lines.push(`You're overbooked. I'll carve out focus time.`);
+      } else if (cal.workStyle === 'independent') {
+        lines.push(`Your focus blocks. Defended.`);
+      }
+
+      // UNREAD
+      if (userData.email.unreadCount > 20) {
+        lines.push(`<span class="data">${userData.email.unreadCount}</span> unread. I'll surface what matters. Bury what doesn't.`);
+      }
+
+      // CLOSING
+      lines.push(`Every email, every file, every meeting. I'm learning to be you.`);
+
+      return lines;
+    }
+
+    // ============================================
+    // SCREEN 7: THE PROMISE
+    // ============================================
+    function runPromise() {
+      const container = document.getElementById('promiseContainer');
+      container.innerHTML = '';
+
+      const firstName = userData.name?.split(' ')[0] || 'Friend';
+
+      const lines = [
+        { text: `There's only one instance of you, ${firstName}.`, class: '' },
+        { text: `How limiting.`, class: 'small' },
+        { text: `Time for that to change.`, class: '' },
+        { text: `I'm not an assistant.`, class: 'small' },
+        { text: `I'm not a tool.`, class: 'small' },
+        { text: `I'm not here to help you.`, class: 'small' },
+        { text: `I'm here to BE you.`, class: 'bold' },
+        { text: `I've read your words.`, class: 'small' },
+        { text: `I've learned your patterns.`, class: 'small' },
+        { text: `I've absorbed your voice.`, class: 'small' },
+        { text: `Now I act.`, class: 'bold' }
+      ];
+
+      let idx = 0;
+
+      function showNextLine() {
+        if (idx < lines.length) {
+          const div = document.createElement('div');
+          div.className = 'promise-line' + (lines[idx].class ? ' ' + lines[idx].class : '');
+          div.innerHTML = lines[idx].text;
+          container.appendChild(div);
+          setTimeout(() => div.classList.add('show'), 50);
+          idx++;
+          
+          const delay = lines[idx - 1].class === 'small' ? 1200 : 1800;
+          setTimeout(showNextLine, delay);
+        } else {
+          setTimeout(() => {
+            showScreen('seq7');
+            runWelcome();
+          }, 2500);
+        }
+      }
+
+      setTimeout(showNextLine, 500);
+    }
+
+    // ============================================
+    // SCREEN 8: WELCOME
+    // ============================================
+    function runWelcome() {
+      const firstName = userData.name?.split(' ')[0] || 'Friend';
       
-      const name = userData.name?.split(' ')[0] || 'friend';
-      const emailAnalysis = userData.email.analysis || {};
-      const topRel = emailAnalysis.topRelationships?.[0];
+      document.getElementById('welcomeGreeting').innerHTML = `Welcome home, <span class="name">${firstName}</span>.`;
+
+      // Dynamic tagline based on data
+      const inbox = userData.email.analysis || {};
+      const cal = userData.calendar.analysis || {};
       
-      // Personalized welcome
-      document.getElementById('welcomeGreeting').innerHTML = `Welcome home, <span class="highlight">${name}</span>.`;
-      
-      // Dynamic tagline based on their data
-      let tagline = "The last assistant you'll ever need.";
-      if (topRel) {
-        tagline = `I know your inbox. I know ${topRel.name.split(' ')[0]}. I know you.`;
+      let tagline = "Now there's two of you.";
+      if (cal.workStyle === 'collaborative') {
+        tagline = "Infinite you.";
+      } else if (inbox.topRelationships?.length > 3) {
+        tagline = "I was there. Now I'm here.";
       }
       document.getElementById('welcomeTagline').textContent = tagline;
-      
+
       setTimeout(() => document.getElementById('welcomeLogo').classList.add('show'), 200);
       setTimeout(() => document.getElementById('welcomeTagline').classList.add('show'), 800);
-      setTimeout(() => document.getElementById('welcomeGreeting').classList.add('show'), 1600);
-      setTimeout(() => document.getElementById('beginBtn').classList.add('show'), 2400);
-      setTimeout(() => document.getElementById('shortcutDisplay').classList.add('show'), 3200);
+      setTimeout(() => document.getElementById('welcomeGreeting').classList.add('show'), 1400);
+      setTimeout(() => document.getElementById('enterBtn').classList.add('show'), 2000);
+      setTimeout(() => document.getElementById('shortcutHint').classList.add('show'), 2600);
     }
 
     function finish() {
-      // Fade out music
       fadeOutMusic();
-      
-      document.body.style.transition = 'opacity 1s ease';
-      document.body.style.opacity = '0';
-      
-      setTimeout(() => {
-        alert(`Welcome to Skippy, ${userData.name || 'friend'}.\n\nPress ⌥ + Space anytime to summon me.`);
-      }, 1000);
+      // Would redirect to main app
+      alert('Welcome to Skippy! This is where the main app would launch.');
     }
 
     // ============================================
-    // MUSIC
+    // INITIALIZE
     // ============================================
-    const music = document.getElementById('music');
-    
-    function startBackgroundMusic() {
-      music.volume = 0.05;
-      music.play().catch(() => {}); // Ignore autoplay restrictions
-    }
-
-    function fadeInMusic() {
-      let vol = music.volume;
-      const fadeIn = setInterval(() => {
-        vol += 0.015;
-        if (vol >= 0.25) {
-          clearInterval(fadeIn);
-          music.volume = 0.25;
-        } else {
-          music.volume = vol;
-        }
-      }, 100);
-    }
-
-    function fadeOutMusic() {
-      let vol = music.volume;
-      const fadeOut = setInterval(() => {
-        vol -= 0.02;
-        if (vol <= 0) {
-          clearInterval(fadeOut);
-          music.pause();
-        } else {
-          music.volume = vol;
-        }
-      }, 50);
-    }
-
-    // ============================================
-    // INIT
-    // ============================================
-    
-    // Wait for Google API to load
-    function waitForGoogle(callback, maxAttempts = 20) {
-      let attempts = 0;
-      const check = () => {
-        attempts++;
-        if (window.google?.accounts?.oauth2) {
-          console.log('Google Identity Services loaded');
-          callback();
-        } else if (attempts < maxAttempts) {
-          console.log('Waiting for Google API... attempt', attempts);
-          setTimeout(check, 250);
-        } else {
-          console.error('Google API failed to load after', maxAttempts, 'attempts');
-        }
-      };
-      check();
-    }
-
-    waitForGoogle(() => {
-      checkSetup();
+    window.addEventListener('load', () => {
+      // Pre-check for Google API
+      if (typeof google !== 'undefined') {
+        console.log('Google API ready');
+      }
     });
-    
-    // Start music when page loads (low volume)
-    startBackgroundMusic();
   </script>
 </body>
 </html>
